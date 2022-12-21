@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<Project>
+   <Type Value="exe"/>
+   <Description Value="gep"/>
+   <Output Value="C:\Apache24\cgi-bin\gep.exe"/>
+   <XailerVersion Value="7.2"/>
+   <Compiler Value="Harbour"/>
+   <CCompiler Value="MinGW"/>
+   <Font Value="MS Sans Serif,8"/>
+   <MainModule Value="Main.prg"/>
+   <MultipleInstances Value="Y"/>
+   <XPManifest Value="Y"/>
+   <Icon Value="nefele.ico"/>
+   <Parameters Value=""/>
+   <Version>
+      <Version Value="1.0"/>
+      <Release Value="0"/>
+      <Build Value="0"/>
+      <Company Value="Connecti Consultoria"/>
+      <CopyRight Value="Connecti Consultoria &amp; DNA"/>
+      <TradeMarks Value=""/>
+      <Comments Value=""/>
+   </Version>
+   <Directories>
+      <SourceDir Value="Source"/>
+      <IncludeDir Value="Include"/>
+      <ResourceDir Value="Resource"/>
+      <ObjDir Value="Obj"/>
+   </Directories>
+   <Options>
+      <AutomaticMemvarDeclaration Value="N"/>
+      <DebugInfo Value="N"/>
+      <SuppressLineNumberInformation Value="N"/>
+      <SuppressShortcutting Value="N"/>
+      <WarnningLevel Value="1"/>
+      <MoreOptions Value=""/>
+      <MoreCOpt Value=""/>
+      <MapFile Value="N"/>
+      <ConsoleMode Value="N"/>
+      <MoreLinkOpt Value=""/>
+   </Options>
+   <Export>
+      <Dir Value=""/>
+      <Source Value="Y"/>
+      <Exe Value="N"/>
+      <Bin Value="N"/>
+      <Resource Value="Y"/>
+      <ResourceAll Value="Y"/>
+      <ErrorLog Value="N"/>
+      <Subprojects Value="Y"/>
+   </Export>
+   <Clean>
+      <All Value="N"/>
+   </Clean>
+   <FinalExe>
+      <FullCompile Value="Y"/>
+      <TlbInfo Value="N"/>
+      <UpxCompress Value="Y"/>
+      <CompressFlags Value="--compress-exports=0"/>
+      <SignApp Value="N"/>
+      <CertName Value=""/>
+      <Installer Value="N"/>
+      <InstallerFlags Value=""/>
+      <SignInstaller Value="N"/>
+      <InstallerFile Value=""/>
+   </FinalExe>
+   <VCS>
+      <Type Value="SVN"/>
+   </VCS>
+   <Files>
+      <File Filename="gep.rc"/>
+      <File Filename="LangCGI.ch"/>
+      <File Filename="gep.prg"/>
+      <File Filename="gep\src\CadastroCentrosDeCusto.prg"/>
+      <File Filename="gep\src\CadastroDepartamentos.prg"/>
+      <File Filename="gep\src\CadastroFiliais.prg"/>
+      <File Filename="gep\src\CadastroPeriodosSRD.prg"/>
+      <File Filename="gep\src\GrpVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\GrpVerbasFilial.prg"/>
+      <File Filename="gep\src\GrpVerbasFuncao.prg"/>
+      <File Filename="gep\src\GrpVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\GrpVerbasVerbas.prg"/>
+      <File Filename="gep\lib\BBDD.prg"/>
+      <File Filename="gep\lib\Login.prg"/>
+      <File Filename="Main.prg"/>
+      <File Filename="gep\lib\MainPage.prg"/>
+      <File Filename="gep\lib\QueryTotvs.prg"/>
+      <File Filename="gep\lib\Traductor.prg"/>
+      <File Filename="gep\lib\Usuarios.prg"/>
+      <File Filename="gep\lib\GEPParameters.prg"/>
+      <File Filename="gep\src\CadastroGrupos.prg"/>
+      <File Filename="gep\src\CadastroFuncoes.prg"/>
+      <File Filename="gep\lib\stackTools.prg"/>
+      <File Filename="gep\src\CadastroVerbas.prg"/>
+      <File Filename="gep\src\GrpVerbasEmpresa.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasEmpresaDet.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasFilial.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasFilialDet.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasFuncao.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasFuncaoDet.prg"/>
+      <File Filename="gep\src\PainelGrpVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\PainelGrpVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\PainelGrpVerbasFilial.prg"/>
+      <File Filename="gep\src\PainelGrpVerbasEmpresa.prg"/>
+      <File Filename="gep\lib\tbigNThread.prg"/>
+      <File Filename="gep\lib\about.prg"/>
+      <File Filename="gep\src\ChartTotaisGrpVerbasFilial.prg"/>
+      <File Filename="gep\src\ChartTotaisGrpVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\ChartTotaisGrpVerbasFuncao.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasVerbas.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\PainelGrpMasterVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\CadastroGruposMaster.prg"/>
+      <File Filename="gep\src\PainelGrpMasterVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\PainelGrpMasterVerbasFilial.prg"/>
+      <File Filename="gep\src\PainelGrpMasterVerbasEmpresa.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasFilial.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasEmpresa.prg"/>
+      <File Filename="gep\lib\wTWebPage.prg"/>
+      <File Filename="gep\lib\wDatatable.prg"/>
+      <File Filename="gep\lib\wHistory.prg"/>
+      <File Filename="gep\lib\wFixedColumns.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasEmpresa.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasFilial.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\ChartTotaisGrpMasterVerbasFilial.prg"/>
+      <File Filename="gep\src\ChartTotaisGrpMasterVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasEmpresaDet.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasFilialDet.prg"/>
+      <File Filename="gep\src\TotaisGrpMasterVerbasCentroDeCustoDet.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasCentroDeCustoDet.prg"/>
+      <File Filename="gep\src\GrpMasterDetailVerbasEmpresa.prg"/>
+      <File Filename="gep\src\GrpMasterDetailVerbasFilial.prg"/>
+      <File Filename="gep\src\GrpMasterDetailVerbasCentroDeCusto.prg"/>
+      <File Filename="gep\src\GrpMasterDetailVerbasFuncionarios.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasAcumuladosFuncionarios.prg"/>
+      <File Filename="gep\lib\wFixedHeader.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasAcumuladosCentroDeCusto.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasCentroDeCusto.prg"/>
+      <File Filename="hbct.xpj"/>
+      <File Filename="gep\src\GrpMasterVerbasAcumuladosEmpresa.prg"/>
+      <File Filename="gep\src\GrpMasterVerbasAcumuladosFilial.prg"/>
+      <File Filename="gep\src\TurnoverGeralFuncoes.prg"/>
+      <File Filename="gep\src\TurnoverGeralCentroDeCusto.prg"/>
+      <File Filename="gep\src\TurnoverGeralEmpresa.prg"/>
+      <File Filename="gep\src\TurnoverGeralFilial.prg"/>
+      <File Filename="gep\lib\wDashBoardTurnover.prg"/>
+      <File Filename="gep\src\TurnoverGeralEmpresaDashBoard.prg"/>
+      <File Filename="gep\src\TotaisGrpVerbasEmpresa.prg"/>
+      <File Filename="gep\lib\wJQueryDatePicker.prg"/>
+      <File Filename="gep\lib\zJQueryDatePicker.prg"/>
+      <File Filename="gep\lib\webAppManifest.prg"/>
+      <File Filename="gep\lib\GEPFunctions.prg"/>
+      <File Filename="gep\src\TurnoverGeralFuncionarios.prg"/>
+      <File Filename="gep\lib\zDashBoardTurnOver.prg"/>
+      <File Filename="gep\lib\wChartJS.prg"/>
+      <File Filename="gep\lib\zChartJS.prg"/>
+      <File Filename="gep\lib\wRTabs.prg"/>
+   </Files>
+   <Libraries>
+      <Library Filename="[harbour]libcurl-4"/>
+      <Library Filename="[harbour]libcurl"/>
+      <Library Filename="[harbour]hbcurls"/>
+      <Library Filename="[harbour]hbcurl_dll"/>
+      <Library Filename="[harbour]hbcurl"/>
+      <Library Filename="[harbour]hbct" Link="N"/>
+      <Library Filename="[xailer]NefeleProject"/>
+      <Library Filename="[xailer]xailer" First="Y"/>
+      <Library Filename="[xailer]xailertcls"/>
+      <Library Filename="[xailer]samples" Link="N"/>
+      <Library Filename="[xailer]sqlite" Link="N"/>
+      <Library Filename="[xailer]mariadb" Link="N"/>
+      <Library Filename="[xailer]mysql" Link="N"/>
+      <Library Filename="[xailer]xailer.res"/>
+      <Library Filename="[xailer]xailermsg.res"/>
+      <Library Filename="[harbour]hbextern"/>
+      <Library Filename="[harbour]hbdebug"/>
+      <Library Filename="[harbour]hbvm" Link="N"/>
+      <Library Filename="[harbour]hbvmmt"/>
+      <Library Filename="[harbour]hbrtl"/>
+      <Library Filename="[harbour]hblang"/>
+      <Library Filename="[harbour]hbcpage"/>
+      <Library Filename="[harbour]hbuddall"/>
+      <Library Filename="[harbour]hbrdd"/>
+      <Library Filename="[harbour]hbusrrdd"/>
+      <Library Filename="[harbour]rddntx"/>
+      <Library Filename="[harbour]rddcdx"/>
+      <Library Filename="[harbour]rddnsx"/>
+      <Library Filename="[harbour]rddfpt"/>
+      <Library Filename="[harbour]rddads" Link="N"/>
+      <Library Filename="[harbour]ace32" Link="N"/>
+      <Library Filename="[harbour]hbhsx"/>
+      <Library Filename="[harbour]hbsix"/>
+      <Library Filename="[harbour]hbmacro"/>
+      <Library Filename="[harbour]hbcplr"/>
+      <Library Filename="[harbour]hbpp"/>
+      <Library Filename="[harbour]hbcommon"/>
+      <Library Filename="[harbour]hbtip"/>
+      <Library Filename="[harbour]hbmxml"/>
+      <Library Filename="[harbour]mxml"/>
+      <Library Filename="[harbour]hbpcre"/>
+      <Library Filename="[harbour]hbwin"/>
+      <Library Filename="[harbour]hbmzip"/>
+      <Library Filename="[harbour]minizip"/>
+      <Library Filename="[harbour]hbzlib"/>
+      <Library Filename="[harbour]hbzebra"/>
+      <Library Filename="[harbour]xharbour"/>
+      <Library Filename="[mingw]crt2.o"/>
+      <Library Filename="[mingw]gcc\i686-w64-mingw32\7.3.0\crtbegin.o"/>
+      <Library Filename="[mingw]mingw32"/>
+      <Library Filename="[mingw]gcc\i686-w64-mingw32\7.3.0\gcc"/>
+      <Library Filename="[mingw]gcc\i686-w64-mingw32\7.3.0\gcc_eh"/>
+      <Library Filename="[mingw]moldname"/>
+      <Library Filename="[mingw]mingwex"/>
+      <Library Filename="[mingw]msvcrt"/>
+      <Library Filename="[mingw]kernel32"/>
+      <Library Filename="[mingw]user32"/>
+      <Library Filename="[mingw]gdi32"/>
+      <Library Filename="[mingw]advapi32"/>
+      <Library Filename="[mingw]ws2_32"/>
+      <Library Filename="[mingw]winspool"/>
+      <Library Filename="[mingw]comctl32"/>
+      <Library Filename="[mingw]comdlg32"/>
+      <Library Filename="[mingw]shell32"/>
+      <Library Filename="[mingw]uuid"/>
+      <Library Filename="[mingw]ole32"/>
+      <Library Filename="[mingw]oleaut32"/>
+      <Library Filename="[mingw]oledlg"/>
+      <Library Filename="[mingw]mpr"/>
+      <Library Filename="[mingw]winmm"/>
+      <Library Filename="[mingw]mapi32"/>
+      <Library Filename="[mingw]imm32"/>
+      <Library Filename="[mingw]msimg32"/>
+      <Library Filename="[mingw]odbc32"/>
+      <Library Filename="[mingw]wininet"/>
+      <Library Filename="[mingw]version"/>
+      <Library Filename="[mingw]setupapi"/>
+      <Library Filename="[mingw]iphlpapi"/>
+      <Library Filename="[mingw]psapi"/>
+   </Libraries>
+</Project>
+

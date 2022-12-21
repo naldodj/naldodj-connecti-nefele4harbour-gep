@@ -1,0 +1,10 @@
+/*
+ * Proyecto: 	GEP
+ * Fichero: 	GEP.rc
+ * Descripción: Iconos de la app GEP
+ * Autor:		Pedro
+ * Fecha: 		05/08/2021
+ */
+nefele          ICON "/icons/nefele.ico"
+connecti        ICON "/icons/connecti.ico"
+connecti_logo   PNG  "/icons/connecti.ico"

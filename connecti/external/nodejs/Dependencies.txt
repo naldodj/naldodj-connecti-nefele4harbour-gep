@@ -1,0 +1,12 @@
+[Dependencies-node.js]
+node.js
+
+[node-windows]
+//https://dev.to/petereysermans/installing-a-node-js-application-as-a-windows-service-28j7
+Installing a node.js application as a Windows service
+npm install -g node-windows
+npm link node-windows
+
+[json-server]
+
+https://github.com/mabihan/json-server-multiple-files

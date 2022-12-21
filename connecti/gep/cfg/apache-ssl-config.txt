@@ -1,0 +1,45 @@
+https://smallbusiness.chron.com/configure-apache-ssl-windows-46530.html
+
+Problems with openssl.cnf
+1
+Browse to your Apache conf directory, "C:\Program Files\Apache Software Foundation\Apache\conf\" and check the openssl.cnf file. Substitute the correct version number for "." Windows may have reassociated the .cnf extension with SpeedDial or another program.
+
+2
+Go to "Control Panel," then "Folder Options."
+
+3
+Click on the "File Types" tab and browse down the list to the .cnf association.
+
+
+4
+Click on "Change..." to associate the file with Notepad or another text editor.
+
+Keys and Configuration
+1
+Open a command prompt. Press the Windows key and "R" simultaneously to bring up the "Run" dialog box. Type "cmd" in the text box and press "Enter" to launch the Windows command prompt.
+
+2
+Type "cd C:\Program Files\Apache Software Foundation\Apache\bin" at the command prompt, substituting the version number for "," to browse to the bin directory.
+
+3
+Type "set OPENSSL_CONF=C:\Program Files\Apache Software Foundation\Apache\conf\openssl.cnf" to define the location of the openssl.cnf file. You may need to adjust the command to match it to your individual server installation.
+
+4
+Type 'openssl req -config "C:\Program Files\Apache Software Foundation\Apache2.2\conf\openssl.cnf" -new -out mysite.csr -keyout mysite.pem' and follow the prompts to create your certificate. The PEM pass phrase is your private key password; write it down and keep it in a secure location. Note that the command creates keys in the terminal's current working directory, which should be /bin.
+
+5
+Type "openssl rsa -in mysite.pem -out mysite.key" to create an unprotected key for the Apache server.
+
+6
+Type "openssl x509 -in mysite.csr -out mysite.cert -req -signkey mysite.key -days 365" to generate the x509 certificate.
+
+7
+Check through your httpd.conf file, by default in "C:\Program Files\Apache Software Foundation\Apache\conf\" and remove the hash (#) tags on the following lines: LoadModule ssl_module modules/mod_ssl.so Include conf/extra/httpd-ssl.conf
+
+8
+Open the httpd-ssl.conf file in "C:\Program Files\Apache Software Foundation\Apache\conf\extra\" and update these settings to fit your install:
+
+VirtualHost default:443 ServerAdmin DocumentRoot ServerName ErrorLog CustomLog SSLCertificateFile SSLCertificateKeyFile
+
+9
+Restart the Apache server. You can test your configuration by navigating to "https://localhost/" in your Web browser.

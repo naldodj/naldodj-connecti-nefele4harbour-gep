@@ -1,0 +1,8 @@
+[OPTIONS]
+LockControls=.F.
+[BTS]
+BrowseState=0;
+FormCoors=0159009102A301DEn
+[DESKTOP]
+1=gep\lib\QueryTotvs.prg,68,44,68,44,48,0,1856
+Current=1

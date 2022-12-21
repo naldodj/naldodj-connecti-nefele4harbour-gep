@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<Project>
+   <Type Value="lib"/>
+   <Description Value="hbct"/>
+   <Output Value="libhbct.a"/>
+   <XailerVersion Value="7.1"/>
+   <Compiler Value="Harbour"/>
+   <CCompiler Value="MinGW"/>
+   <Font Value="MS Sans Serif,8"/>
+   <MainModule Value=""/>
+   <MultipleInstances Value="Y"/>
+   <XPManifest Value="Y"/>
+   <Icon Value=""/>
+   <Parameters Value=""/>
+   <Version>
+      <Version Value="1.0"/>
+      <Release Value="0"/>
+      <Build Value="0"/>
+      <Company Value="Connecti Consultoria"/>
+      <CopyRight Value=""/>
+      <TradeMarks Value=""/>
+      <Comments Value=""/>
+   </Version>
+   <Directories>
+      <SourceDir Value="Source"/>
+      <IncludeDir Value="Include"/>
+      <ResourceDir Value="Resource"/>
+      <ObjDir Value="Obj"/>
+   </Directories>
+   <Options>
+      <AutomaticMemvarDeclaration Value="N"/>
+      <DebugInfo Value="N"/>
+      <SuppressLineNumberInformation Value="N"/>
+      <SuppressShortcutting Value="N"/>
+      <WarnningLevel Value="1"/>
+      <MoreOptions Value=""/>
+      <MoreCOpt Value=""/>
+      <MapFile Value="N"/>
+      <ConsoleMode Value="N"/>
+      <MoreLinkOpt Value=""/>
+   </Options>
+   <Export>
+      <Dir Value=""/>
+      <Source Value="Y"/>
+      <Exe Value="N"/>
+      <Bin Value="N"/>
+      <Resource Value="Y"/>
+      <ResourceAll Value="N"/>
+      <ErrorLog Value="N"/>
+      <Subprojects Value="Y"/>
+   </Export>
+   <Clean>
+      <All Value="N"/>
+   </Clean>
+   <FinalExe>
+      <FullCompile Value="N"/>
+      <TlbInfo Value="N"/>
+      <UpxCompress Value="N"/>
+      <CompressFlags Value=""/>
+      <SignApp Value="N"/>
+      <CertName Value=""/>
+      <Installer Value="N"/>
+      <InstallerFlags Value=""/>
+      <SignInstaller Value="N"/>
+      <InstallerFile Value=""/>
+   </FinalExe>
+   <VCS>
+      <Type Value="None"/>
+   </VCS>
+   <Files>
+      <File Filename="..\harbour\contrib\hbct\datetime.c"/>
+      <File Filename="..\harbour\contrib\hbct\dattime2.c"/>
+      <File Filename="..\harbour\contrib\hbct\dattime3.c"/>
+   </Files>
+</Project>
+
