@@ -19,6 +19,8 @@ PROCEDURE MainPage()
 
    LOCAL cCall
 
+   local cBGImage:="./connecti/resource/images/"+IF(Time()>="18:00>00","connecti-consultoria-login-background-at-night.jpg","connecti-consultoria-login-background-in-the-morning.jpg")
+
    oCGI:__clearUserData()
 
    // Comenzamos instanciando la Página Web que queremos crear
@@ -32,7 +34,7 @@ PROCEDURE MainPage()
       :lValign := .T.
       :lContainer := .F.
 
-      :cBackground       := "./connecti/resource/images/connecti-consultoria-login-background.jpg"
+      :cBackground       := cBGImage
       :cBackgroundSize   := "cover"
       :lBackgroundRepeat := .F.
 

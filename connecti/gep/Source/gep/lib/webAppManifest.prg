@@ -30,6 +30,16 @@ function webAppManifest()
       "sizes": "768x432"
     },
     {
+      "src": "./connecti/resource/images/connecti-consultoria-login-background-at-night.jpg",
+      "type": "image/png",
+      "sizes": "768x432"
+    },
+    {
+      "src": "./connecti/resource/images/connecti-consultoria-login-background-in-the-morning.jpg",
+      "type": "image/png",
+      "sizes": "768x432"
+    },
+    {
       "src": "./connecti/resource/images/connecti-consultoria-logo.png",
       "type": "image/png",
       "sizes": "250x76"

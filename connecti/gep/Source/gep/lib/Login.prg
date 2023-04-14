@@ -13,6 +13,8 @@
 
 PROCEDURE Login(aParams)
 
+   local cBGImage:="./connecti/resource/images/"+IF(Time()>="18:00>00","connecti-consultoria-login-background-at-night.jpg","connecti-consultoria-login-background-in-the-morning.jpg")
+
    // Comenzamos instanciando la Página Web que queremos crear
    With Object wTWebPage():New()
 
@@ -23,7 +25,7 @@ PROCEDURE Login(aParams)
       :cClrFootPane      := "#012444"//"#45DD98"
       :lBackgroundRepeat := .F.
       :cBackgroundSize   := "cover"
-      :cBackground       := "./connecti/resource/images/connecti-consultoria-login-background.jpg"
+      :cBackground       := cBGImage
       :cLanguage         := {"pt-BR","es-ES"}[AppData:nLang]
       :cInHead          := '<meta name="google" content="notranslate" />'
       :cInMain          += HistoryReplaceState()
@@ -53,6 +55,7 @@ PROCEDURE Login(aParams)
          :oStyle:cBorder_radius := "20px"
          :oStyle:cBorder_style  := "ridge"
          :oStyle:cBorder_color  := "#012444"//"#45DD98"
+         :oStyle:cBackground  := "rgb(0,0,0,.8) !important"//"#45DD98"
 
          // Un texto de tamaño grande tendrá un título
          With Object WLabel():New(:WO)
@@ -67,18 +70,18 @@ PROCEDURE Login(aParams)
          with object WForm():New(:WO)
             :cFunction  := "ControlAcceso"   //Al tener un botón lSubmit:=.T. esta cFunction pasa a la función llamada el contenido de todas las variables en un array aParams
             :lUniqueId  := .T.
-
             with object WEdit():New(:WO)
                :cId        := "usuario"
                WITH OBJECT:oStyle
                   :cFont:="Helvetica"
                   :cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif !important;"
+                  :cColor:="#fff"
                END
-               :cTitle     := "<b><span style='color:#012444'>"+nfl_Tag("b",Lang(LNG_USERID))+"</span></b>"
+               :cTitle     := "<b><span style='color:#808080'>"+nfl_Tag("b",Lang(LNG_USERID))+"</span></b>"
                :cValue     := oCGI:GetCgiValue("usuario","")
                :aWidth[xc_M]  := 6
-               :cHintClrText := "#012444"
-               :cTitleClrText := "#012444"
+               :cHintClrText := "#808080"
+               :cTitleClrText := "#808080"
                :cIcon      := "person"
                :SetRequired()
                :Create()
@@ -90,7 +93,7 @@ PROCEDURE Login(aParams)
                   :cFont:="Helvetica"
                   :cFont_face:="Helvetica"
                   :cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif !important;"
-                  :cColor:="#012444"
+                  :cColor:="#fff"
                END WITH
                :cTitleClrText := :oStyle:cColor
                :cTitle        := "<b><span>"+nfl_Tag("b",Lang(LNG_USERPASS))+"</span></b>"
@@ -108,15 +111,19 @@ PROCEDURE Login(aParams)
                   :cFont:="Helvetica"
                   :cFont_face:="Helvetica"
                   :cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif !important;"
-                  :cColor:="#012444"
+                  :cColor:="#808080"
                END WITH
                :cTitleClrText := :oStyle:cColor
                :cIcon           := "business"
-               :cTitle          := "<b><span style='color:"+:cTitleClrText+"'>"+nfl_Tag("b",Lang(LNG_EMPRESA))+"</span></b>"
+               :oIcon:cIcon:=:cIcon
+               :oIcon:cClrIcon := "#FED300"
+               :cTitle          := "<b><span style='color:"+:cTitleClrText+" !important'>"+nfl_Tag("b",Lang(LNG_EMPRESA))+"</span></b>"
                :aItems          := GetSM0()
                :cSelected       := :aItems[1][1]
                :aWidth[xc_M]    := 12
                :cOnChange       := "CambiaEmp"
+               :cCSS+='.select-wrapper input.select-dropdown {color:white !important;}'
+               :cCSS+='.dropdown-content {background-color:#808080 !important;}'
                :Create()
             End With
 
@@ -126,10 +133,12 @@ PROCEDURE Login(aParams)
                   :cFont:="Helvetica"
                   :cFont_face:="Helvetica"
                   :cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif !important;"
-                  :cColor:="#012444"
+                  :cColor:="#808080"
                END WITH
                :cTitleClrText := :oStyle:cColor
                :cIcon           := "g_translate"
+               :oIcon:cIcon:=:cIcon
+               :oIcon:cClrIcon := "#FED300"
                :cTitle          := "<b><span style='color:"+:cTitleClrText+"'>"+nfl_Tag("b",Lang(LNG_IDIOMA))+"</span></b>"
                :AddItem(1,"Português/Brasileiro",,"./idiomas/br.png")
                :AddItem(2,"Español",,"./idiomas/es.png")

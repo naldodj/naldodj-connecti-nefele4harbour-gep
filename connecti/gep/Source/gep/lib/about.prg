@@ -15,9 +15,11 @@ PROCEDURE About()
 
     local hUser := LoginUser()
 
+    local cBGImage:="./connecti/resource/images/"+IF(Time()>="18:00>00","connecti-consultoria-login-background-at-night.jpg","connecti-consultoria-login-background-in-the-morning.jpg")
+
     With Object wTWebPage():New()
 
-      :cBackground       := "./connecti/resource/images/connecti-consultoria-login-background.jpg"
+      :cBackground       := cBGImage
       :cBackgroundColor:="#012444"
       :cBackgroundSize   := "cover"
       :lBackgroundRepeat := .F.
