@@ -385,7 +385,7 @@ STATIC FUNCTION Extraer( codModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSen
       IF (!Empty(cFilter))
          cFilter+=" AND "
       endif
-      cFilter+="ZY__CODIGO='"+codGrupo+"'"
+      cFilter+="ZY__MASTER='"+codGrupo+"'"
     ELSE
       IF (HB_HHasKey(hFilter,"codGrupo"))
          HB_HDel(hFilter,"codGrupo")

@@ -423,7 +423,7 @@ STATIC FUNCTION Extraer( codModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSen
       IF (!Empty(cFilter))
          cFilter+=" AND "
       endif
-      cFilter+="RA_FILIAL='"+codFilial+"'"
+      cFilter+="RD_FILIAL='"+codFilial+"'"
    else
       IF (HB_HHasKey(hFilter,"codFilial"))
          HB_HDel(hFilter,"codFilial")

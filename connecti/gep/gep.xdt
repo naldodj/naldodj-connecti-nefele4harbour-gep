@@ -4,11 +4,9 @@ LockControls=.F.
 BrowseState=0;
 FormCoors=0159009102A301DEn
 [DESKTOP]
-1=gep\lib\QueryTotvs.prg,68,44,68,44,51,0,1856
-2=gep\lib\Login.prg,78,18,78,18,73,0,1492
-3=gep\lib\GEPParameters.prg,183,8,183,8,183,0,3328
-4=gep\src\CadastroDepartamentos.prg,211,0,211,0,194,0,1744
-5=gep\lib\MainPage.prg,109,55,109,6,92,0,1492
-6=gep\lib\about.prg,17,123,17,123,7,462,1450
-7=gep\lib\webAppManifest.prg,37,97,37,97,24,0,680
-Current=2
+1=gep\lib\MainPage.prg,183,0,183,0,174,0,1472
+2=Main.prg,338,39,344,0,329,0,976
+3=gep\src\GrpMasterVerbasFilial.prg,425,6,425,6,408,0,1808
+4=gep\src\GrpMasterVerbasEmpresa.prg,60,28,60,28,65,0,1808
+5=gep\lib\QueryTotvs.prg,0,0,0,0,0,0,1856
+Current=5

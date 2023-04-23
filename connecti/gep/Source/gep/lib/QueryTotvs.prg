@@ -14,24 +14,26 @@
 
 #xtranslate nfl_CreateObject => CreateObject
 
-#define TIMEOUT_Resolve (5*1000)
-#define TIMEOUT_Connect (5*1000)
+#define TIMEOUT_Resolve (15*1000)
+#define TIMEOUT_Connect (15*1000)
 #define TIMEOUT_Send    (15*1000)
 #define TIMEOUT_Receive (15*1000)
 
-//------------------------------------------------------------------------------
-
-FUNCTION QueryCodModel( cHost, cModel, cFilter, nItems, nPag, cParModel )
-RETURN QueryTotvs( cHost, "codModel",, cModel, cFilter, nItems, nPag, cParModel )
+#define ZGIP_ENABLE .F.
 
 //------------------------------------------------------------------------------
 
-FUNCTION QueryCodAlias( cHost, cAlias, cFilter, nItems, nPag, cParModel )
-RETURN QueryTotvs( cHost, "codAlias", cAlias,, cFilter, nItems, nPag, cParModel )
+FUNCTION QueryCodModel(cHost,cModel,cFilter,nItems,nPag,cParModel,lGZipEnabled)
+RETURN(QueryTotvs(cHost,"codModel",nil,cModel,cFilter,nItems,nPag,cParModel,@lGZipEnabled))
 
 //------------------------------------------------------------------------------
 
-FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParModel )
+FUNCTION QueryCodAlias(cHost,cAlias,cFilter,nItems,nPag,cParModel,lGZipEnabled)
+RETURN(QueryTotvs(cHost,"codAlias",cAlias,nil,cFilter,nItems,nPag,cParModel,@lGZipEnabled))
+
+//------------------------------------------------------------------------------
+
+FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZipEnabled)
 
    LOCAL oOle, hItem
    LOCAL hDatos := { "status" => 0, "message" => "", "ok" => .F., "response" => { => } }
@@ -42,6 +44,8 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
    LOCAL nResponseCode:=0
 
    LOCAL uURLGet
+
+   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
 
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    AppData:cAuth := oCGI:GetUserData( "cAuth", AppData:cAuth )
@@ -72,7 +76,7 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
       cHost+=cParameters
 
       TRY
-         uURLGet:=cURLGet(cHost,cModel,@nResponseCode,cAuth,cTenantId)
+         uURLGet:=cURLGet(cHost,cModel,@nResponseCode,cAuth,cTenantId,lGZipEnabled)
       END TRY
 
       /*
@@ -90,7 +94,7 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
          hDatos[ "message" ] := "ok"
          hDatos[ "ok" ] := .T.
 
-         hb_jsonDecode( uURLGet, @hDatos[ "response" ] )
+         hb_jsonDecode( IF(lGZipEnabled,HB_ZUncompress(uURLGet),uURLGet), @hDatos[ "response" ]  )
 
       ELSE
 
@@ -121,9 +125,15 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
             ENDIF
 
             oOle:Open( "GET", cHost, .F. )
-            oOle:SetRequestHeader( "Content-Type", "application/json;charset=utf-8" )
-            oOle:SetRequestHeader( "Authorization", AppData:cAuth )
-            oOle:SetRequestHeader( "tenantId", cTenantId )
+            oOle:SetRequestHeader("Content-Type", "application/json;charset=utf-8")
+            oOle:SetRequestHeader("Authorization", AppData:cAuth)
+            oOle:SetRequestHeader("tenantId", cTenantId)
+
+            IF (lGZipEnabled)
+               oOle:SetRequestHeader("Accept-Encoding", "gzip,deflate")
+               oOle:SetRequestHeader("Content-Encoding", "gzip")
+            endif
+
             oOle:Send()
 
             hDatos[ "status" ]  := oOle:status
@@ -139,7 +149,7 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
             */
             IF ( ( oOle:STATUS >= 200 ) .AND. ( oOle:STATUS <= 299 ) )
                hDatos[ "ok" ] := .T.
-               hb_jsonDecode( oOle:ResponseText, @hDatos[ "response" ] )
+               hb_jsonDecode( IF(lGZipEnabled,HB_ZUncompress(oOle:ResponseText),oOle:ResponseText),  @hDatos["response"]  )
             ELSE
                hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", oOle:statusText + hb_osNewLine() + oOle:ResponseText + hb_osNewLine() + cHost )
             ENDIF
@@ -158,7 +168,7 @@ FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParMo
 RETURN hDatos
 
 
-static function cURLGet(cHost,cModel,nResponseCode,cAuth,cTenantId)
+static function cURLGet(cHost,cModel,nResponseCode,cAuth,cTenantId,lGZipEnabled)
 
    local aHeader
 
@@ -167,6 +177,8 @@ static function cURLGet(cHost,cModel,nResponseCode,cAuth,cTenantId)
    local nError
 
    local uValue
+
+   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
 
    curl_global_init()
 
@@ -182,6 +194,11 @@ static function cURLGet(cHost,cModel,nResponseCode,cAuth,cTenantId)
          IF (!Empty(cTenantId))
             aAdd(aHeader,"tenantId: "+cTenantId)
          ENDIF
+
+         IF (lGZipEnabled)
+            aAdd(aHeader,"Accept-Encoding: gzip,deflate")
+            aAdd(aHeader,"Content-Encoding: gzip")
+         endif
 
          //If there's an authorization token, you attach it to the header like this:
          curl_easy_setopt(hCurl,HB_CURLOPT_HTTPHEADER,aHeader)
@@ -448,7 +465,7 @@ FUNCTION GetDataFields( codModel, bFunction, cColsPrint, aFieldsADD )
 
 return( aFields )
 
-FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lSendJSON, lGetFields, cFile, cParModel, lNoCacheDatos, cGrpFiles )
+FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON,lGetFields,cFile,cParModel,lNoCacheDatos,cGrpFiles,lGZipEnabled)
 
    LOCAL aRow
    LOCAL aSource
@@ -494,6 +511,8 @@ FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lS
    LOCAL nRowspPageMax
 
    LOCAL uValue
+
+   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
 
    aSource := {}
 
@@ -587,7 +606,7 @@ FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lS
             FOR nFile := nPagina TO nFiles
                cFileProtheus := cPathProtheus
                cFileProtheus += aFilesProtheus[ nFile ][ F_NAME ]
-               hDatosTmp := getCachedFile(cModel,aFilesProtheus[ nFile ][ F_NAME ],cFileProtheus)
+               hDatosTmp := getCachedFile(cModel,aFilesProtheus[ nFile ][ F_NAME ],cFileProtheus,lGZipEnabled)
                IF ( HB_ISHASH( hDatosTmp ) )
                   IF ( hb_HHasKey( hDatos[ "response" ],"table" ) )
                      IF ( hb_HHasKey( hDatos[ "response" ][ "table" ],"items" ) )
@@ -617,7 +636,7 @@ FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lS
       ENDIF
 
       IF ( !lDatos )
-         hDatos := QueryCodModel( AppData:cHost, cModel, cFilter, 1, 1, cParModel )
+         hDatos := QueryCodModel(AppData:cHost,cModel,cFilter,1,1,cParModel,@lGZipEnabled)
       ENDIF
 
       IF ( hDatos[ "ok" ] )
@@ -635,7 +654,7 @@ FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lS
              nPagina := ( if( nRecords == 0,0,Int(nPage / nRecords ) ) + 1 )
 
              IF ( !lDatos )
-                hDatos := QueryCodModel( AppData:cHost, cModel, cFilter, nRecords, nPagina )
+                hDatos := QueryCodModel(AppData:cHost,cModel,cFilter,nRecords,nPagina,nil,@lGZipEnabled)
              ENDIF
 
          endif
@@ -727,7 +746,7 @@ FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lS
 
 RETURN(IF(lSendJSON,hb_jsonEncode(hResultado,.F.),hResultado))
 
-static function getCachedFile(cModel,cEndPoint,cFullPathFile)
+static function getCachedFile(cModel,cEndPoint,cFullPathFile,lGZipEnabled)
 
     local aDisabledHosts
     local cDisabledHosts
@@ -746,6 +765,8 @@ static function getCachedFile(cModel,cEndPoint,cFullPathFile)
 
     local nResponseCode:=0
 
+    HB_Default(@lGZipEnabled,ZGIP_ENABLE)
+
     cJSONServer:=StrTran(oCGI:GetUserData(cModel+":jsonServer:Host",""),"DISABLED_JSONSERVER_HOST","")
 
     IF (!Empty(cJSONServer))
@@ -758,7 +779,7 @@ static function getCachedFile(cModel,cEndPoint,cFullPathFile)
            cHost+="/"
         endif
         cHost += "0"
-        cJSON:=cURLGet(cHost,cModel,@nResponseCode,NIL,NIL)
+        cJSON:=cURLGet(cHost,cModel,@nResponseCode,NIL,NIL,lGZipEnabled)
 
         lStatusOK:= ( !Empty(cJSON) .AND. ( nResponseCode >= 200 ) .and. ( nResponseCode <= 299 ) )
 
@@ -793,6 +814,12 @@ static function getCachedFile(cModel,cEndPoint,cFullPathFile)
                   oOle:Open("GET",cHost,.F.)
 
                   oOle:SetRequestHeader("Content-Type","application/json;charset=utf-8")
+
+                  IF (lGZipEnabled)
+                     oOle:SetRequestHeader("Accept-Encoding", "gzip,deflate")
+                     oOle:SetRequestHeader("Content-Encoding", "gzip")
+                  ENDIF
+
                   oOle:Send()
 
                   SWITCH (oOle:STATUS)
@@ -815,7 +842,7 @@ static function getCachedFile(cModel,cEndPoint,cFullPathFile)
          ENDIF
 
          IF (lStatusOK)
-             hb_jsonDecode(cJSON,@hJSON)
+             hb_jsonDecode(IF(lGZipEnabled,HB_ZUncompress(cJSON),cJSON),@hJSON)
              IF ((HB_HHasKey(hJSON,"id")).and.(HB_HHasKey(hJSON,"data")))
                   IF (hJSON["id"]==0)
                      hJSON:=hJSON["data"]
