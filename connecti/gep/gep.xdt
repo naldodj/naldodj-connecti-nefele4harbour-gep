@@ -4,5 +4,5 @@ LockControls=.F.
 BrowseState=0;
 FormCoors=0159009102A301DEn
 [DESKTOP]
-1=gep\lib\QueryTotvs.prg,0,0,0,0,0,0,1856
+1=gep\lib\QueryTotvs.prg,54,30,54,30,54,0,1856
 Current=1
