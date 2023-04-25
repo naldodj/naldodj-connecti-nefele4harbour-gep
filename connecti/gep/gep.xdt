@@ -4,5 +4,6 @@ LockControls=.F.
 BrowseState=0;
 FormCoors=0159009102A301DEn
 [DESKTOP]
-1=gep\lib\QueryTotvs.prg,54,30,54,30,54,0,1856
-Current=1
+1=gep\lib\QueryTotvs.prg,621,22,621,18,615,0,1856
+2=gep\src\TurnoverGeralEmpresaDashBoard.prg,0,0,0,0,0,0,1568
+Current=2
