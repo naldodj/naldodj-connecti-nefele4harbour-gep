@@ -71,6 +71,12 @@ function totvsGetDataModel {
 
     [int]$RowspPageMax=[int]$ini.rest.RowspPageMax
 
+    if ($ini.rest.TimeOutSec -eq $null) {
+        $TimeOutSec = 60
+    } else {
+        $TimeOutSec = $ini.rest.TimeOutSec
+    }
+
     $Utf8NoBomEncoding=New-Object System.Text.UTF8Encoding $False
 
     $MC=Measure-Command {
@@ -192,7 +198,7 @@ function totvsGetDataModel {
             Method="GET"
             ContentType=$ContentType
             Body=$Body
-            TimeoutSec=0
+            TimeOutSec=$TimeOutSec
         }
 
         $result=Invoke-RestMethod @params
@@ -217,7 +223,7 @@ function totvsGetDataModel {
                 Method="GET"
                 ContentType=$ContentType
                 Body=$Body
-                TimeoutSec=0
+                TimeOutSec=$TimeOutSec
             }
 
             try {
@@ -246,18 +252,18 @@ function totvsGetDataModel {
         do
         {
 
-            if ($result.TotalPage -eq 0){
+            if (-not $result.TotalPages -or $result.TotalPages -eq 0){
                 break
             }
 
             $nPercent=[int](($result.PageNumber/$result.TotalPages)*100)
-            $nPercent=($nPercent,100 | Measure-Object -Min).Minimum
+            $nPercent=[math]::Min($nPercent,100)
 
             $sPageNumber=("{0:d10}" -f $result.PageNumber)
             $sTotalPages=("{0:d10}" -f $result.TotalPages)
 
             Write-Progress -id 0 `
-                           -Activity "Processando [$sPageNumber]/[$sTotalPages)][$codModel]" `
+                           -Activity "Processando [$sPageNumber]/[$sTotalPages][$codModel]" `
                            -PercentComplete "$nPercent" `
                            -Status ("Working["+($nPercent)+"]%")
 
@@ -320,7 +326,7 @@ function totvsGetDataModel {
                         Method="PUT"
                         ContentType=$ContentType
                         Body=($jsonServerdbEndPointData | ConvertTo-Json -depth 100 -Compress)
-                        TimeoutSec=0
+                        TimeOutSec=$TimeOutSec
                     }
                     try {
                         $jsonServerResult=Invoke-RestMethod @params
@@ -359,7 +365,7 @@ function totvsGetDataModel {
                 Method="GET"
                 ContentType=$ContentType
                 Body=$Body
-                TimeoutSec=0
+                TimeOutSec=$TimeOutSec
             }
 
             try {

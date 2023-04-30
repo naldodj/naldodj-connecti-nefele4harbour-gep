@@ -70,7 +70,13 @@ function totvsGetDataModelPeriod {
     [System.Object]$ini=Get-IniFile $scriptIni
 
     [int]$RowspPageMax=[int]$ini.rest.RowspPageMax
-
+    
+    if ($ini.rest.TimeOutSec -eq $null) {
+        $TimeOutSec = 60
+    } else {
+        $TimeOutSec = $ini.rest.TimeOutSec
+    }
+    
     $Utf8NoBomEncoding=New-Object System.Text.UTF8Encoding $False
 
     $MC=Measure-Command {
@@ -176,7 +182,7 @@ function totvsGetDataModelPeriod {
             Method="GET"
             ContentType=$ContentType
             Body=$Body
-            TimeoutSec=0
+            TimeOutSec=$TimeOutSec
         }
 
         $resultPeriodosSRD=Invoke-RestMethod @params
@@ -266,13 +272,13 @@ function totvsGetDataModelPeriod {
 
             $nPagenumber++
             $nPercent=[int](($nPagenumber/$resultPeriodosSRD.table.items.Length)*100)
-            $nPercent=($nPercent,100 | Measure-Object -Min).Minimum
+            $nPercent=[math]::Min($nPercent,100)
 
             $sPageNumber=("{0:d10}" -f $nPagenumber)
             $sTotalPages=("{0:d10}" -f $resultPeriodosSRD.table.items.Length)
 
             Write-Progress -id 0 `
-                        -Activity "Processando [$sPageNumber]/[$sTotalPages)][$msgProcess0 :: $PeriodoSRD]" `
+                        -Activity "Processando [$sPageNumber]/[$sTotalPages][$msgProcess0 :: $PeriodoSRD]" `
                         -PercentComplete "$nPercent" `
                         -Status ("Working["+($nPercent)+"]%")
 
@@ -302,7 +308,7 @@ function totvsGetDataModelPeriod {
                 Method="GET"
                 ContentType=$ContentType
                 Body=$Body
-                TimeoutSec=0
+                TimeOutSec=$TimeOutSec
             }
 
             try {
@@ -333,7 +339,7 @@ function totvsGetDataModelPeriod {
                     Method="GET"
                     ContentType=$ContentType
                     Body=$Body
-                    TimeoutSec=0
+                    TimeOutSec=$TimeOutSec
                 }
 
                 try {
@@ -364,19 +370,19 @@ function totvsGetDataModelPeriod {
             do
             {
 
-                if ($result.TotalPage -eq 0){
+                if (-not $result.TotalPages -or $result.TotalPages -eq 0){
                     break
                 }
 
                 $nPercent=[int]((++$nRowCount/$result.TotalPages)*100)
-                $nPercent=($nPercent,100 | Measure-Object -Min).Minimum
+                $nPercent=[math]::Min($nPercent,100)
 
                 $sRowCount=("{0:d10}" -f $nRowCount)
                 $sPageNumber=("{0:d10}" -f $result.PageNumber)
                 $sTotalPages=("{0:d10}" -f $result.TotalPages)
 
                 Write-Progress -id 1 `
-                            -Activity "Processando [$sRowCount]/[$sTotalPages)][$msgProcess1 :: $PeriodoSRD]" `
+                            -Activity "Processando [$sRowCount]/[$sTotalPages][$msgProcess1 :: $PeriodoSRD]" `
                             -PercentComplete "$nPercent" `
                             -Status ("Working["+($nPercent)+"]%")
 
@@ -438,7 +444,7 @@ function totvsGetDataModelPeriod {
                             Method="PUT"
                             ContentType=$ContentType
                             Body=($jsonServerdbEndPointData | ConvertTo-Json -depth 100 -Compress)
-                            TimeoutSec=0
+                            TimeOutSec=$TimeOutSec
                         }
                         try {
                             $jsonServerResult=Invoke-RestMethod @params
@@ -477,7 +483,7 @@ function totvsGetDataModelPeriod {
                     Method="GET"
                     ContentType=$ContentType
                     Body=$Body
-                    TimeoutSec=0
+                    TimeOutSec=$TimeOutSec
                 }
 
                 try {

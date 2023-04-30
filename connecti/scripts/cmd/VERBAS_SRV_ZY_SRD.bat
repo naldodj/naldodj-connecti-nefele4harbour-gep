@@ -18,10 +18,8 @@ dir ..\ps\log\%ps1FileLog%
 :: Verificando se há erros no arquivo de log
 set /p hasError=<..\ps\log\%ps1FileLog%
 
-:: Se houver erros, imprime o erro, aguarda uma hora e reinicia o script
+:: Se houver erros, imprime o erro
 if [%hasError%] NEQ [] (
   @echo on
   echo %hasError%
-  timeout /T 3600 /NOBREAK > NUL
-  start /b %cmdFile%
 )
