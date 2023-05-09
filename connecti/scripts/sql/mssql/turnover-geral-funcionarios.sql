@@ -52,6 +52,7 @@ BEGIN
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND SRE.RE_DATA=(
                                     SELECT MIN(SRE_M.RE_DATA)
                                       FROM SRE990 SRE_M
@@ -59,6 +60,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_FILIAL)
@@ -70,6 +72,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC                                   
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MAX(SRE_M.RE_DATA)
@@ -78,6 +81,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_FILIAL)
@@ -90,6 +94,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MIN(SRE_M.RE_DATA)
@@ -98,6 +103,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_CC)
@@ -109,6 +115,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MAX(SRE_M.RE_DATA)
@@ -117,6 +124,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_CC)
@@ -147,6 +155,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MIN(SRE_M.RE_DATA)
@@ -155,6 +164,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_MAT)
@@ -166,6 +176,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MAX(SRE_M.RE_DATA)
@@ -174,6 +185,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_MAT)
@@ -190,6 +202,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MIN(SRE_M.RE_DATA)
@@ -198,6 +211,7 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_FILIAL)
@@ -209,6 +223,7 @@ BEGIN
                                    AND SRE.RE_EMPP=!EMPRESA!
                                    AND SRE.RE_FILIALP=SRA.RA_FILIAL
                                    AND SRE.RE_MATP=SRA.RA_MAT
+                                   AND SRE.RE_CODUNIC=SRA.RA_CODUNIC
                                    AND LEFT(SRE.RE_DATA,6)=months.PERIODO
                                    AND SRE.RE_DATA=(
                                     SELECT MIN(SRE_M.RE_DATA)
@@ -217,11 +232,13 @@ BEGIN
                                        AND SRE_M.RE_EMPP=!EMPRESA!
                                        AND SRE_M.RE_FILIALP=SRE.RE_FILIALP
                                        AND SRE_M.RE_MATP=SRE.RE_MATP
+                                       AND SRE_M.RE_CODUNIC=SRE.RE_CODUNIC
                                        AND LEFT(SRE_M.RE_DATA,6)=months.PERIODO
                                   )
                             ),SRA.RA_MAT)
                         ),SRA.R_E_C_N_O_)
-                FROM SRA990 SRA
+                        ,SRA.RA_CODUNIC
+                FROM SRA010 SRA
           CROSS JOIN !TBLTMPMONTHS! months
                WHERE SRA.D_E_L_E_T_=''
                  AND SRA.RA_FILIAL BETWEEN !FILIALDE! AND !FILIALATE!
@@ -244,6 +261,7 @@ BEGIN
                      ,SRA.RA_CODFUNC
                      ,SRA.RA_MAT
                      ,SRA.R_E_C_N_O_
+                     ,SRA.RA_CODUNIC
              )
            ,TURNOVER AS (
                     SELECT DISTINCT
@@ -254,6 +272,7 @@ BEGIN
                          ,RA_CODFUNC=PERIODO.RA_CODFUNC_D
                          ,SRJ.RJ_DESC
                          ,RA_MAT=PERIODO.RA_MAT_D
+                         ,PERIODO.RA_CODUNIC
                          ,SRARECNO=PERIODO.SRARECNO_D
                          ,ISNULL(
                          (
@@ -267,6 +286,7 @@ BEGIN
                                      AND SRE_T.RE_FILIALD=PERIODO.RA_FILIAL_D
                                      AND SRE_T.RE_CCD=PERIODO.RA_CC_D
                                      AND SRE_T.RE_MATD=PERIODO.RA_MAT_D
+                                     AND SRE_T.RE_CODUNIC=PERIODO.RA_CODUNIC
                                 GROUP BY LEFT(SRE_T.RE_DATA,6)
                                         ,SRE_T.RE_EMPD
                                         ,SRE_T.RE_FILIALD
@@ -287,6 +307,7 @@ BEGIN
                                      AND SRE_T.RE_FILIALP=PERIODO.RA_FILIAL_P
                                      AND SRE_T.RE_CCP=PERIODO.RA_CC_P
                                      AND SRE_T.RE_MATP=PERIODO.RA_MAT_P
+                                     AND SRE_T.RE_CODUNIC=PERIODO.RA_CODUNIC
                                 GROUP BY LEFT(SRE_T.RE_DATA,6)
                                         ,SRE_T.RE_EMPP
                                         ,SRE_T.RE_FILIALP
@@ -315,6 +336,7 @@ BEGIN
                                        AND SRA_T.RA_CC=PERIODO.RA_CC
                                        AND SRA_T.RA_CODFUNC=PERIODO.RA_CODFUNC
                                        AND SRA_T.RA_MAT=PERIODO.RA_MAT
+                                       AND SRA_T.RA_CODUNIC=PERIODO.RA_CODUNIC
                                  ) T
                          ),0) TFUNMES
                          ,ISNULL(
@@ -329,6 +351,7 @@ BEGIN
                                          AND SRA_A.RA_CC=PERIODO.RA_CC
                                          AND SRA_A.RA_CODFUNC=PERIODO.RA_CODFUNC
                                          AND SRA_A.RA_MAT=PERIODO.RA_MAT
+                                         AND SRA_A.RA_CODUNIC=PERIODO.RA_CODUNIC
                                     GROUP BY LEFT(SRA_A.RA_ADMISSA,6)
                                             ,SRA_A.RA_FILIAL
                                             ,SRA_A.RA_CC
@@ -347,6 +370,7 @@ BEGIN
                                      AND SRA_D.RA_CC=PERIODO.RA_CC
                                      AND SRA_D.RA_CODFUNC=PERIODO.RA_CODFUNC
                                      AND SRA_D.RA_MAT=PERIODO.RA_MAT
+                                     AND SRA_D.RA_CODUNIC=PERIODO.RA_CODUNIC
                                      AND SRA_D.RA_DEMISSA<>''
                                GROUP BY LEFT(SRA_D.RA_DEMISSA,6)
                                        ,SRA_D.RA_FILIAL
@@ -375,6 +399,7 @@ BEGIN
                       ,TURNOVER.RJ_DESC
                       ,TURNOVER.RA_MAT
                       ,TURNOVER.SRARECNO
+                      ,TURNOVER.RA_CODUNIC
                       ,TTRFSAI=SUM(TURNOVER.TTRFSAI)
                       ,TTRFENT=SUM(TURNOVER.TTRFENT)
                       ,TFUNIMES=SUM(CAST((TURNOVER.TFUNMES-TURNOVER.TFUNADMMES) AS FLOAT))
@@ -392,6 +417,7 @@ BEGIN
                       ,TURNOVER.RJ_DESC
                       ,TURNOVER.RA_MAT
                       ,TURNOVER.SRARECNO
+                      ,TURNOVER.RA_CODUNIC
             )
         SELECT DISTINCT
               TURNOVERT.PERIODO
