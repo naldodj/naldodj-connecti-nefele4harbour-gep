@@ -70,7 +70,7 @@ function totvsGetDataModelPeriodAcc {
     [System.Object]$ini=Get-IniFile $scriptIni
 
     [int]$RowspPageMax=[int]$ini.rest.RowspPageMax
-    
+
     if ($ini.rest.TimeOutSec -eq $null) {
         $TimeOutSec = 60
     } else {
@@ -211,9 +211,9 @@ function totvsGetDataModelPeriodAcc {
         $msgProcess1=$codModel
 
         $jsonPath=$ini.rest.jsonPath
-        
+
         Clear-Variable ini
-        
+
         if (-not $jsonPath.EndsWith("\"))
         {
             $jsonPath+="\"
@@ -263,6 +263,8 @@ function totvsGetDataModelPeriodAcc {
                 ("!VERBAATE!","'Z'"),
                 ("!FUNCAODE!","' '"),
                 ("!FUNCAOATE!","'Z'"),
+                ("!FUNCAOAGRDE!","' '"),
+                ("!FUNCAOAGRATE!","'Z'"),
                 ("!MATRICULADE!","' '"),
                 ("!MATRICULAATE!","'Z'")
             )
@@ -417,7 +419,7 @@ function totvsGetDataModelPeriodAcc {
                         id=0
                         data=$result
                     }
-                    
+
                     $jsonServerdbJSON=@{
                         $jsonServerdbEndPoint=@(
                             $jsonServerdbEndPointData
@@ -489,19 +491,22 @@ function totvsGetDataModelPeriodAcc {
                     TimeOutSec=$TimeOutSec
                 }
 
+                Clear-Variable result
+
                 try {
-                    Clear-Variable result
                     $result=Invoke-RestMethod @params
-                    $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
                 } catch {
-                    $hasNextPage=$False
-                    Write-Host $_
+                    $hasNextPage=$false
+                }
+
+                if ($result -and $result.hasNextPage){
+                    $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
+                } else {
+                    $hasNextPage=$false
                 }
 
                 Clear-Variable Body
                 Clear-Variable params
-
-                start-sleep -Seconds .05
 
             } while ($hasNextPage)
 

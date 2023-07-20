@@ -173,6 +173,8 @@ function totvsGetDataModel {
             ("!VERBAATE!","'Z'"),
             ("!FUNCAODE!","' '"),
             ("!FUNCAOATE!","'Z'"),
+            ("!FUNCAOAGRDE!","' '"),
+            ("!FUNCAOAGRATE!","'Z'"),
             ("!MATRICULADE!","' '"),
             ("!MATRICULAATE!","'Z'")
         )
@@ -368,13 +370,18 @@ function totvsGetDataModel {
                 TimeOutSec=$TimeOutSec
             }
 
+            Clear-Variable result
+
             try {
-                Clear-Variable result
                 $result=Invoke-RestMethod @params
-                $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
             } catch {
-                $hasNextPage=$False
-                Write-Host $_
+                $hasNextPage=$false
+            }
+            
+            if ($result -and $result.hasNextPage){
+                $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
+            } else {
+                $hasNextPage=$false
             }
 
             Clear-Variable Body

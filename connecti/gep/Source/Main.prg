@@ -22,12 +22,7 @@ PROCEDURE CGI_Init()
    LOCAL cFileIMG
    LOCAL cPrintIMG
 
-#define __ALT_D__ 1
-#ifdef __ALT_D__    // Compile with -b
-
-   AltD( 1 )         // Enables the debugger. Press F5 to go.
-   AltD()          // Invokes the debugger
-#endif
+   ErrorBlock({|oError|errorHandler(oError)})
 
    // Instanciamos el Objeto TCGI que se encargara de procesar la llamada recibida desde el navegador y
    // que nos ha suministrado Apache al llamar al ejecutable
@@ -490,6 +485,13 @@ CLASS TCgi FROM XCgi
 
 //-------------------------------------------------------------------------------------------------
 
+   METHOD TurnoverFilFuncPrevXRealizado() INLINE ParametersTurnoverFilFuncPrevXRealizado()
+   METHOD __TurnoverFilFuncPrevXRealizado() INLINE __TurnoverFilFuncPrevXRealizado()
+   METHOD __TurnoverFilFuncPrevXRealizadoDet() INLINE __TurnoverFilFuncPrevXRealizado(nil,nil,-1)
+   METHOD GetDataTurnoverFilFuncPrevXRealizado() INLINE GetDataTurnoverFilFuncPrevXRealizado()
+   METHOD ParametersTurnoverFilFuncPrevXRealizado() INLINE ParametersTurnoverFilFuncPrevXRealizado()
+
+//-------------------------------------------------------------------------------------------------
 
 END CLASS
 
@@ -506,3 +508,87 @@ FUNCTION gepIni()
    ENDIF
 
 return( hIni )
+
+function errorHandler(e)
+
+   LOCAL i := 1  /* Start are "real" error */
+
+   LOCAL cHTML
+   LOCAL cErrorFile
+
+   LOCAL hUser
+
+   LOCAL cErr := "Runtime error" + hb_eol() + ;
+      hb_eol() + ;
+      "Gencode: " + hb_ntos( e:GenCode ) + hb_eol() + ;
+      "Desc: " + e:Description +  + hb_eol() + ;
+      "Sub-system: " + hb_ntos( e:SubCode ) + hb_eol() + ;
+      "Operation: " + e:operation + hb_eol() + ;
+      hb_eol() + ;
+      "Call trace:" + hb_eol() + ;
+      hb_eol()
+
+   WHILE ! Empty( ProcName( ++i ) )
+      cErr += RTrim( ProcName( i ) ) + "(" + hb_ntos( ProcLine( i ) ) + ")" + hb_eol()
+   END WHILE
+
+   IF (Type("AppData")=="O")
+      cErrorFile:=AppData:PathLog
+   ELSE
+      cErrorFile:=""
+   ENDIF
+   cErrorFile+=( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_errorHandler.log"
+
+   hb_MemoWrit( cErrorFile , cErr )
+
+   IF (Type("oCgi")=="O")
+
+      WITH OBJECT wTWebPage():New()
+
+         :cTitle:= "Error Page"
+
+         IF (!stacktools():IsInCallStack("LoginUser"))
+            hUser:=LoginUser()
+         ELSE
+            hUser:={;
+               "user"=>"errorHandler",;
+               "pass"=>"@#errorHandleradmin!@",;
+               "name"=>"errorHandler",;
+               "adminuser"=>.F.,;
+               "activo"=>.F.;
+            }
+         ENDIF
+
+         AppMenu(:WO,ProcName(),hUser,.F.,NIL,NIL,NIL,.F.)
+
+         WITH OBJECT WFloatingBtn():New(:WO)
+            :cClrPane:="#005FAB"
+            :cName:=("WFloatingBtn"+ProcName())
+            :cId:=Lower(:cName)
+            :cText:="Voltar"
+            :oIcon:cIcon:="arrow_back"
+            :oIcon:cClrIcon := "#FED300"
+            :cOnClick:="MainFunction"
+            :Create()
+         END WITH
+
+         WITH OBJECT WEdit():New(:WO)
+             :cId:="error"
+             :cTitle:="error"
+             :cIcon:="error"
+             :cValue:=cErr
+             :SetMemo()
+             :Create()
+           END WITH
+
+         :Create()
+
+         oCgi:SendPage( :Create() )
+
+         __Quit()
+
+      END
+
+   ENDIF
+
+return(cErr)

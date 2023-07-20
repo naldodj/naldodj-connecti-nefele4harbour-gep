@@ -444,7 +444,7 @@ STATIC FUNCTION Extraer(codModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSend
 
    AppData:cEmp:=oCGI:GetUserData("cEmp",AppData:cEmp)
    HB_Default(AppData:cEmp,"")
-   cFile:=(AppData:RootPath+"data\"+AppData:cEmp+"_"+Lower(ProcName(1))+".json")
+   cFile:=(AppData:PathData+AppData:cEmp+"_"+Lower(ProcName(1))+".json")
 
    hFilter:={=>}
 

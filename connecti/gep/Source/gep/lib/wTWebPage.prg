@@ -56,6 +56,7 @@ static function replaceHtmlText(cHtml)
 
    local aTextReplace:=Array(0)
 
+   local cCR10:=Chr(10)
    local cCRLF:=HB_OsNewLine()
    local cReplace
 
@@ -66,6 +67,7 @@ static function replaceHtmlText(cHtml)
    TEXT INTO cReplace
 
    <meta charset='utf-8'/>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
 
    <meta http-equiv='content-type' content='text/css; charset=utf-8' />
    <meta http-equiv='content-type' content='application/json; charset=utf-8'/>
@@ -79,7 +81,7 @@ static function replaceHtmlText(cHtml)
 
    <meta name='keywords' content='ConnecTI, RH, Painel' />
    <meta name='copyright' content='© @yearCopyright@ ConnecTI Consultoria' />
-   <meta name='description' content='PAINELRH' />
+   <meta name='description' content='CONNECTI CONSULTORIA PAINELRH' />
 
    <meta http-equiv='cache-control' content='max-age=0' />
    <meta http-equiv='cache-control' content='no-cache' />
@@ -92,6 +94,8 @@ static function replaceHtmlText(cHtml)
    <meta name='rating' content='general' />
 
    <meta http-equiv='content-language' content='pt-br,es-ES,en-US' />
+
+   <meta name="google" content="notranslate" />
 
    ENDTEXT
    cReplace:=StrTran(cReplace,"@yearCopyright@",hb_NtoS(Year(Date())))
@@ -114,6 +118,14 @@ static function replaceHtmlText(cHtml)
    aAdd(aTextReplace,{'<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>','<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'})
 
    aEval(aTextReplace,{|t|cHtml:=StrTran(cHtml,t[1],t[2])})
+
+   while (cCR10$cHtml)
+      cHtml:=StrTran(cHtml,cCR10," ")
+   end while
+
+   while ("  "$cHtml)
+      cHtml:=StrTran(cHtml,"  "," ")
+   end while
 
    return(cHtml)
 

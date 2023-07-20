@@ -1,6 +1,6 @@
 // Proyecto: GEP
 /*
- * Fichero: TurnOverGeralFuncoes.prg
+ * Fichero: TurnoverFilFuncPrevXRealizado.prg
  * Descripción:
  * Autor:
  * Fecha: 14/08/2021
@@ -11,21 +11,18 @@
 #include "Nefele.ch"
 #include "LangCGI.ch"
 
-#define __CODMODEL__ "TURNOVERGERALFUNCOES"
+#define __CODMODEL__ "TURNOVERFILFUNCPREVXREALIZADO"
 
-PROCEDURE ParametersTurnOverGeralFuncoes( lGrpViewTotais )
+PROCEDURE ParametersTurnoverFilFuncPrevXRealizado()
 
    LOCAL hUser := LoginUser()
 
-   LOCAL cSubTitle := " :: " + "Consulta TurnOver Geral por Funções"
+   LOCAL cSubTitle := " :: " + "Consulta TurnOver Geral por Funções :: Previsto x Realizado"
    LOCAL cTitle := AppData:AppTitle + cSubTitle
    LOCAL cIDParameters
    LOCAL aParameters
 
-   hb_default( @lGrpViewTotais, .F. )
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:lGrpViewTotais", lGrpViewTotais )
-
-   oCGI:SetUserData( "TurnOverGeralFuncoes:Back", ProcName() )
+   oCGI:SetUserData( "TurnoverFilFuncPrevXRealizado:Back", ProcName() )
 
    WITH OBJECT wTWebPage():New()
 
@@ -33,9 +30,9 @@ PROCEDURE ParametersTurnOverGeralFuncoes( lGrpViewTotais )
 
       AppMenu( :WO, AppData:AppName, hUser, .F. )
 
-      aParameters := { "codPeriodo", "codPeriodoAte", "codFilial", "codCentroDeCusto", "codFuncao" }
+      aParameters := { "codPeriodo", "codPeriodoAte", "codFilial", "codAgrFuncao" }
       cSubTitle := AppData:AppName + cSubTitle
-      GEPParameters( :WO, @cIDParameters, "__TurnOverGeralFuncoes", aParameters, .T., cSubTitle, .T. ):Create()
+      GEPParameters( :WO, @cIDParameters, "__TurnoverFilFuncPrevXRealizado", aParameters, .T., cSubTitle, .T. ):Create()
 
       :lValign    := .F.
       :lContainer := .F.
@@ -46,15 +43,14 @@ PROCEDURE ParametersTurnOverGeralFuncoes( lGrpViewTotais )
 
 RETURN
 
-FUNCTION __TurnOverGeralFuncoes( lExecute, hFilter, nMaxRowspPage )
+FUNCTION __TurnoverFilFuncPrevXRealizado( lExecute, hFilter, nMaxRowspPage )
 
    LOCAL cIDModal
 
    LOCAL codFilial
-   LOCAL codFuncao
+   LOCAL codAgrFuncao
    LOCAL codPeriodo
    LOCAL codPeriodoAte
-   LOCAL codCentroDeCusto
 
    LOCAL hIDModal
 
@@ -64,19 +60,19 @@ FUNCTION __TurnOverGeralFuncoes( lExecute, hFilter, nMaxRowspPage )
    lFilter := ( HB_ISHASH( hFilter ) .AND. !Empty( hFilter ) )
    hb_default( @hFilter, { => } )
 
-   IF ( stacktools():IsInCallStack( "TCGI:__TurnOverGeralFuncoesDet" ) )
-      deleteTmpParameters( "__TurnOverGeralFuncoes" )
+   IF ( stacktools():IsInCallStack( "TCGI:__TurnoverFilFuncPrevXRealizadoDet" ) )
+      deleteTmpParameters( "__TurnoverFilFuncPrevXRealizado" )
    ELSE
-      restoreTmpParameters( "__TurnOverGeralFuncoes", @hFilter, .T. )
+      restoreTmpParameters( "__TurnoverFilFuncPrevXRealizado", @hFilter, .T. )
    ENDIF
 
    IF ( lExecute )
-      cIDModal := oCGI:GetCgiValue( "cIDModalTotaisTurnOverGeralFuncoes", "" )
+      cIDModal := oCGI:GetCgiValue( "cIDModalTotaisTurnoverFilFuncPrevXRealizado", "" )
       IF ( !Empty( cIDModal ) )
          oCGI:SetUserData( "HistoryRemoveParams", .F. )
          cIDModal := __base64Decode( cIDModal )
          hb_jsonDecode( cIDModal, @hIDModal )
-         saveTmpParameters( "__TurnOverGeralFuncoes", hIDModal )
+         saveTmpParameters( "__TurnoverFilFuncPrevXRealizado", hIDModal )
          IF ( hb_HHasKey( hIDModal,"codFilial" ) )
             codFilial := hIDModal[ "codFilial" ]
          ENDIF
@@ -86,74 +82,59 @@ FUNCTION __TurnOverGeralFuncoes( lExecute, hFilter, nMaxRowspPage )
          IF ( hb_HHasKey( hIDModal,"codPeriodoAte" ) )
             codPeriodoAte := hIDModal[ "codPeriodoAte" ]
          ENDIF
-         IF ( hb_HHasKey( hIDModal,"codFuncao" ) )
-            codFuncao := hIDModal[ "codFuncao" ]
-         ENDIF
-         IF ( hb_HHasKey( hIDModal,"codCentroDeCusto" ) )
-            codCentroDeCusto := hIDModal[ "codCentroDeCusto" ]
+         IF ( hb_HHasKey( hIDModal,"codAgrFuncao" ) )
+            codAgrFuncao := hIDModal[ "codAgrFuncao" ]
          ENDIF
       ELSE
          IF ( hb_HHasKey( hFilter,"codFilial" ) )
             codFilial := hFilter[ "codFilial" ]
-            oCGI:SetUserData( "__TurnOverGeralFuncoes:codFilial", codFilial )
+            oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codFilial", codFilial )
          ELSE
             codFilial := oCGI:GetCgiValue( "codFilial", "" )
          ENDIF
          IF ( hb_HHasKey( hFilter,"codPeriodo" ) )
             codPeriodo := hFilter[ "codPeriodo" ]
-            oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodo", codPeriodo )
+            oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo", codPeriodo )
          ELSE
             codPeriodo := oCGI:GetCgiValue( "codPeriodo", "" )
          ENDIF
          IF ( hb_HHasKey( hFilter,"codPeriodoAte" ) )
             codPeriodoAte := hFilter[ "codPeriodoAte" ]
-            oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodoAte", codPeriodoAte )
+            oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte", codPeriodoAte )
          ELSE
             codPeriodoAte := oCGI:GetCgiValue( "codPeriodoAte", "" )
          ENDIF
-         IF ( hb_HHasKey( hFilter,"codFuncao" ) )
-            codFuncao := hFilter[ "codFuncao" ]
-            oCGI:SetUserData( "__TurnOverGeralFuncoes:codFuncao", codFuncao )
+         IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
+            codAgrFuncao := hFilter[ "codAgrFuncao" ]
+            oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codAgrFuncao", codAgrFuncao )
          ELSE
-            codFuncao := oCGI:GetCgiValue( "codFuncao", "" )
-         ENDIF
-         IF ( hb_HHasKey( hFilter,"codCentroDeCusto" ) )
-            codCentroDeCusto := hFilter[ "codCentroDeCusto" ]
-            oCGI:SetUserData( "__TurnOverGeralFuncoes:codCentroDeCusto", codCentroDeCusto )
-         ELSE
-            codCentroDeCusto := oCGI:GetCgiValue( "codCentroDeCusto", "" )
+            codAgrFuncao := oCGI:GetCgiValue( "codAgrFuncao", "" )
          ENDIF
       ENDIF
    ELSE
       IF ( hb_HHasKey( hFilter,"codFilial" ) )
          codFilial := hFilter[ "codFilial" ]
-         oCGI:SetUserData( "__TurnOverGeralFuncoes:codFilial", codFilial )
+         oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codFilial", codFilial )
       ELSE
          codFilial := oCGI:GetCgiValue( "codFilial", "" )
       ENDIF
       IF ( hb_HHasKey( hFilter,"codPeriodo" ) )
          codPeriodo := hFilter[ "codPeriodo" ]
-         oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodo", codPeriodo )
+         oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo", codPeriodo )
       ELSE
          codPeriodo := oCGI:GetCgiValue( "codPeriodo", "" )
       ENDIF
       IF ( hb_HHasKey( hFilter,"codPeriodoAte" ) )
          codPeriodoAte := hFilter[ "codPeriodoAte" ]
-         oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodoAte", codPeriodoAte )
+         oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte", codPeriodoAte )
       ELSE
          codPeriodoAte := oCGI:GetCgiValue( "codPeriodoAte", "" )
       ENDIF
-      IF ( hb_HHasKey( hFilter,"codFuncao" ) )
-         codFuncao := hFilter[ "codFuncao" ]
-         oCGI:SetUserData( "__TurnOverGeralFuncoes:codFuncao", codFuncao )
+      IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
+         codAgrFuncao := hFilter[ "codAgrFuncao" ]
+         oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codAgrFuncao", codAgrFuncao )
       ELSE
-         codFuncao := oCGI:GetCgiValue( "codFuncao", "" )
-      ENDIF
-      IF ( hb_HHasKey( hFilter,"codCentroDeCusto" ) )
-         codCentroDeCusto := hFilter[ "codCentroDeCusto" ]
-         oCGI:SetUserData( "__TurnOverGeralFuncoes:codCentroDeCusto", codCentroDeCusto )
-      ELSE
-         codCentroDeCusto := oCGI:GetCgiValue( "codCentroDeCusto", "" )
+         codAgrFuncao := oCGI:GetCgiValue( "codAgrFuncao", "" )
       ENDIF
    ENDIF
 
@@ -180,52 +161,39 @@ FUNCTION __TurnOverGeralFuncoes( lExecute, hFilter, nMaxRowspPage )
          ENDIF
       ENDIF
 
-      IF ( Empty( codFuncao ) )
-         codFuncao := oCGI:GetCgiValue( "GEPParameters_codFuncao", "" )
-         IF ( Empty( codFuncao ) )
-            codFuncao := oCGI:GetUserData( "__GEPParameters:codFuncao", codFuncao )
-         ENDIF
-      ENDIF
-
-      IF ( Empty( codCentroDeCusto ) )
-         codCentroDeCusto := oCGI:GetCgiValue( "GEPParameters_codCentroDeCusto", "" )
-         IF ( Empty( codCentroDeCusto ) )
-            codCentroDeCusto := oCGI:GetUserData( "__GEPParameters:codCentroDeCusto", codCentroDeCusto )
+      IF ( Empty( codAgrFuncao ) )
+         codAgrFuncao := oCGI:GetCgiValue( "GEPParameters_codAgrFuncao", "" )
+         IF ( Empty( codAgrFuncao ) )
+            codAgrFuncao := oCGI:GetUserData( "__GEPParameters:codAgrFuncao", codAgrFuncao )
          ENDIF
       ENDIF
 
    ENDIF
 
    hFilter[ "codFilial" ] := codFilial
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codFilial", codFilial )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codFilial", codFilial )
 
    hFilter[ "codPeriodo" ] := codPeriodo
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodo", codPeriodo )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo", codPeriodo )
 
    hFilter[ "codPeriodoAte" ] := codPeriodoAte
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodoAte", codPeriodoAte )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte", codPeriodoAte )
 
-   hFilter[ "codFuncao" ] := codFuncao
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codFuncao", codFuncao )
-
-   hFilter[ "codCentroDeCusto" ] := codCentroDeCusto
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codCentroDeCusto", codCentroDeCusto )
-
-   saveTmpParameters( "__TurnOverGeralFuncoes", hb_HDel( hFilter,"codFuncao" ) )
+   hFilter[ "codAgrFuncao" ] := codAgrFuncao
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codAgrFuncao", codAgrFuncao )
 
    IF ( lExecute )
-      saveTmpParameters( "__TurnOverGeralFuncionarios", hb_HDel( hb_HDel(hb_HDel(hFilter,"codCentroDeCusto" ),"codFilial" ),"codFuncao" ) )
       oCGI:SetUserData( "TurnOverGeralFuncionarios:Back", ProcName() )
-      TurnOverGeralFuncoes( nMaxRowspPage )
+      TurnoverFilFuncPrevXRealizado( nMaxRowspPage )
    ENDIF
 
 RETURN( hFilter )
 
-PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
+PROCEDURE TurnoverFilFuncPrevXRealizado( nMaxRowspPage )
 
    LOCAL hUser := LoginUser()
 
-   LOCAL cSubTitle := " :: " + "Consulta TurnOver Geral por Funções"
+   LOCAL cSubTitle := " :: " + "Consulta TurnOver Geral por Funções :: Previsto x Realizado"
    LOCAL cTitle := AppData:AppTitle + cSubTitle
    LOCAL cColsPrint
    LOCAL cIDParameters
@@ -236,7 +204,6 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
    LOCAL nFields
    LOCAL nRowspPageMax
 
-   LOCAL cTmp
 
    LOCAL hFilter
 
@@ -247,8 +214,8 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
 
    LOCAL owDataTable
 
-   IF ( !stackTools():IsInCallStack( "__TurnOverGeralFuncoes" ) )
-      hFilter := __TurnOverGeralFuncoes( .F. )
+   IF ( !stackTools():IsInCallStack( "__TurnoverFilFuncPrevXRealizado" ) )
+      hFilter := __TurnoverFilFuncPrevXRealizado( .F. )
    ENDIF
 
    WITH OBJECT wTWebPage():New()
@@ -268,8 +235,8 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
          :Create()
       END WITH
 
-      codPeriodo := oCGI:GetUserData( "__TurnOverGeralFuncoes:codPeriodo" )
-      codPeriodoAte := oCGI:GetUserData( "__TurnOverGeralFuncoes:codPeriodoAte" )
+      codPeriodo := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo" )
+      codPeriodoAte := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte" )
 
       IF ( ( codPeriodoAte < codPeriodo ) ) .OR. ( Left( codPeriodoAte,4 ) <> Left( codPeriodo,4 ) )
 
@@ -284,29 +251,29 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
 
       ELSE
 
-         aParameters := { "codPeriodo", "codPeriodoAte", "codFilial", "codCentroDeCusto", "codFuncao" }
+         aParameters := { "codPeriodo", "codPeriodoAte", "codFilial", "codAgrFuncao" }
          cSubTitle := AppData:AppName
-         GEPParameters( :WO, @cIDParameters, "__TurnOverGeralFuncoesDet", aParameters, .F., cSubTitle ):Create()
+         GEPParameters( :WO, @cIDParameters, "__TurnoverFilFuncPrevXRealizadoDet", aParameters, .F., cSubTitle ):Create()
 
          :lValign    := .F.
          :lContainer := .F.
 
-         aFields := GetDataFieldsTurnOverGeralFuncoes( @cColsPrint )
+         aFields := GetDataFieldsTurnoverFilFuncPrevXRealizado( @cColsPrint )
          nRowspPageMax := oCGI:GetUserData( __CODMODEL__ + ":RowspPageMax", 10 )
          hb_default( @nMaxRowspPage, nRowspPageMax )
 
-         WITH OBJECT owDataTable:=wDatatable():New( :WO )
+         WITH OBJECT owDataTable := wDatatable():New( :WO )
 
-            :cId := Lower( "browseTurnOverGeralFuncoes" )
+            :cId := Lower( "browseTurnoverFilFuncPrevXRealizado" )
 
             DataTableCSS( :cID )
 
             :cCSS += AppData:CSSDataTable
 
-            cPrintIMG:=oCGI:GetUserData("cPrintIMG")
+            cPrintIMG := oCGI:GetUserData( "cPrintIMG" )
 
             // Botones Datatable
-            WITH OBject :AddButton( "Exportar" )
+            WITH OBJECT :AddButton( "Exportar" )
                TEXT INTO :cCustom
                   {
                      extend: 'collection',
@@ -320,7 +287,7 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                               columns: cColsPrint,
                               format: {
                                  body: function ( data, row, column, node ) {
-                                    if (column<=5) {
+                                    if (column<=4) {
                                        //Text Value
                                        data="\u200C"+data;
                                     }
@@ -342,7 +309,6 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                               $('row:gt(1) c[r^="C"]',sheet).attr('s','50');
                               $('row:gt(1) c[r^="D"]',sheet).attr('s','50');
                               $('row:gt(1) c[r^="E"]',sheet).attr('s','50');
-                              $('row:gt(1) c[r^="F"]',sheet).attr('s','50');
                            }
                         },
                         {
@@ -361,11 +327,11 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                               doc.styles.tableHeader.fontSize = 8.45;
                               doc.styles.tableFooter.fontSize = 8.45;
                               var rowCount = doc.content[1].table.body.length;
-                              for (c = 6; c < doc.content[1].table.body[0].length; c++) { // right align headers for numeric cols
+                              for (c = 5; c < doc.content[1].table.body[0].length; c++) { // right align headers for numeric cols
                                  doc.content[1].table.body[0][c].alignment = 'right';
                               }
                               for (i = 1; i < rowCount; i++) {
-                                  for (c = 6; c < doc.content[1].table.body[i].length; c++) { // right align numeric cols
+                                  for (c = 5; c < doc.content[1].table.body[i].length; c++) { // right align numeric cols
                                        doc.content[1].table.body[i][c].alignment = 'right';
                                   }
                               }
@@ -440,13 +406,13 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                      ]
                   }
                ENDTEXT
-               :cCustom:=strTran(:cCustom,"cColsPrint",cColsPrint)
-               :cCustom:=strTran(:cCustom,"@tbl@",owDataTable:cID)
-               :cCustom:=strTran(:cCustom,"cPrintIMG",cPrintIMG)
-               :cCustom:=strTran(:cCustom,"@cTitle@",cTitle)
+               :cCustom := StrTran( :cCustom, "cColsPrint", cColsPrint )
+               :cCustom := StrTran( :cCustom, "@tbl@", owDataTable:cID )
+               :cCustom := StrTran( :cCustom, "cPrintIMG", cPrintIMG )
+               :cCustom := StrTran( :cCustom, "@cTitle@", cTitle )
             END WITH
 
-            WITH OBject :AddButton( "Imprimir" )
+            WITH OBJECT :AddButton( "Imprimir" )
                TEXT INTO :cCustom
                   {
                      extend: 'print',
@@ -469,11 +435,11 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                      }
                   }
                ENDTEXT
-               :cCustom:=strTran(:cCustom,"cColsPrint",cColsPrint)
-               :cCustom:=strTran(:cCustom,"cPrintIMG",cPrintIMG)
+               :cCustom := StrTran( :cCustom, "cColsPrint", cColsPrint )
+               :cCustom := StrTran( :cCustom, "cPrintIMG", cPrintIMG )
             END WITH
 
-            WITH OBject :AddButton( "Parâmetros" )
+            WITH OBJECT :AddButton( "Parâmetros" )
                :cAction := nfl_OpenModal( cIDParameters, .T. )
             END WITH
 
@@ -506,11 +472,7 @@ PROCEDURE TurnOverGeralFuncoes( nMaxRowspPage )
                   END
                NEXT nField
 
-               cTmp := { "Detalhes", "Detalhes" }[ AppData:nLang ]
-               :AddColumnButton( "loupe", cTmp, "btn-wDatatable ;", "__TurnOverGeralFuncionariosDet", "dt-center", "", /*,'fn_click'*/ )
-               :AddColumnDef( nField ):width := '14px'
-
-               :ajax := { "cgi" => "GetDataTurnOverGeralFuncoes" }
+               :ajax := { "cgi" => "GetDataTurnoverFilFuncPrevXRealizado" }
 
             END
 
@@ -530,7 +492,7 @@ RETURN
 
 //------------------------------------------------------------------------------
 
-FUNCTION GetDataTurnOverGeralFuncoes( lSendJSON, lGetFull, cSearchFilter )
+FUNCTION GetDataTurnoverFilFuncPrevXRealizado( lSendJSON, lGetFull, cSearchFilter )
 
    LOCAL aRow
    LOCAL aOrder
@@ -572,13 +534,13 @@ FUNCTION GetDataTurnOverGeralFuncoes( lSendJSON, lGetFull, cSearchFilter )
    hb_default( @lSendJSON, .T. )
 
    IF ( !nLimit == 0 )
-      GetDataFieldsTurnOverGeralFuncoes()
+      GetDataFieldsTurnoverFilFuncPrevXRealizado()
       xJSONData := Extraer( codModel, nStart, nLimit, nDraw, cSearchFilter, aOrder, lSendJSON, .F. )
    ENDIF
 
 RETURN( if( lSendJSON,oCGI:SendJson(xJSONData ),xJSONData ) )
 
-FUNCTION GetDataFieldsTurnOverGeralFuncoes( cColsPrint )
+FUNCTION GetDataFieldsTurnoverFilFuncPrevXRealizado( cColsPrint )
 
    LOCAL aFields
    LOCAL codModel := __CODMODEL__
@@ -590,6 +552,7 @@ return( aFields )
 
 //-------------------------------------------
 // Recuperamos los datos
+
 STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lSendJSON, lGetFields )
 
    LOCAL cFile
@@ -598,10 +561,9 @@ STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder
    LOCAL cGrpFiles
 
    LOCAL codFilial
-   LOCAL codFuncao
+   LOCAL codAgrFuncao
    LOCAL codPeriodo
    LOCAL codPeriodoAte
-   LOCAL codCentroDeCusto
 
    LOCAL hFilter
    LOCAL hFilterBetween
@@ -615,13 +577,12 @@ STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder
    hFilter := { => }
    hFilterBetween := { => }
 
-   restoreTmpParameters( "__TurnOverGeralFuncoes", @hFilter, .T. )
+   restoreTmpParameters( "__TurnoverFilFuncPrevXRealizado", @hFilter, .T. )
 
-   codFilial := oCGI:GetUserData( "__TurnOverGeralFuncoes:codFilial" )
-   codFuncao := oCGI:GetUserData( "__TurnOverGeralFuncoes:codFuncao" )
-   codPeriodo := oCGI:GetUserData( "__TurnOverGeralFuncoes:codPeriodo" )
-   codPeriodoAte := oCGI:GetUserData( "__TurnOverGeralFuncoes:codPeriodoAte" )
-   codCentroDeCusto := oCGI:GetUserData( "__TurnOverGeralFuncoes:codCentroDeCusto" )
+   codFilial := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codFilial" )
+   codAgrFuncao := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codAgrFuncao" )
+   codPeriodo := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo" )
+   codPeriodoAte := oCGI:GetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte" )
 
    hb_default( @cFilter, "" )
 
@@ -630,7 +591,7 @@ STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder
       IF ( !Empty( cFilter ) )
          cFilter += " AND "
       ENDIF
-      cFilter += "RA_FILIAL='" + codFilial + "'"
+      cFilter += "ZV__FILIAL='" + codFilial + "'"
    ELSE
       IF ( hb_HHasKey( hFilter,"codFilial" ) )
          hb_HDel( hFilter, "codFilial" )
@@ -657,20 +618,20 @@ STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder
       IF ( !Empty( cFilter ) )
          cFilter += " AND "
       ENDIF
-      cFilter += "PERIODO BETWEEN '" + codPeriodo + "' AND '" + codPeriodoAte + "'"
+      cFilter += "ZV__ANOMES BETWEEN '" + codPeriodo + "' AND '" + codPeriodoAte + "'"
       hFilterBetween[ "codPeriodo" ] := { codPeriodo, codPeriodoAte }
       hFilterBetween[ "codPeriodoAte" ] := { codPeriodo, codPeriodoAte }
    ENDIF
 
-   IF ( !Empty( codCentroDeCusto ) )
-      hFilter[ "codCentroDeCusto" ] := codCentroDeCusto
+   IF ( !Empty( codAgrFuncao ) )
+      hFilter[ "codAgrFuncao" ] := codAgrFuncao
       IF ( !Empty( cFilter ) )
          cFilter += " AND "
       ENDIF
-      cFilter += "RA_CC='" + codCentroDeCusto + "'"
+      cFilter += "ZV__CODFUN='" + codAgrFuncao + "'"
    ELSE
-      IF ( hb_HHasKey( hFilter,"codCentroDeCusto" ) )
-         hb_HDel( hFilter, "codCentroDeCusto" )
+      IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
+         hb_HDel( hFilter, "codAgrFuncao" )
       ENDIF
    ENDIF
 
@@ -699,16 +660,15 @@ STATIC FUNCTION Extraer( codModel, nPage, nRecords, nDraw, cSearchFilter, aOrder
 
 RETURN( xData )
 
-PROCEDURE __clearTurnOverGeralFuncoes()
+PROCEDURE __clearTurnoverFilFuncPrevXRealizado()
 
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codFilial", "" )
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codFuncao", "" )
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodo", "" )
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codPeriodoAte", "" )
-   oCGI:SetUserData( "__TurnOverGeralFuncoes:codCentroDeCusto", "" )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codFilial", "" )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codAgrFuncao", "" )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodo", "" )
+   oCGI:SetUserData( "__TurnoverFilFuncPrevXRealizado:codPeriodoAte", "" )
 
-   oCGI:SetUserData( "TurnOverGeralFuncoes:Back", "ParametersTurnOverGeralFuncoes" )
+   oCGI:SetUserData( "TurnoverFilFuncPrevXRealizado:Back", "ParametersTurnoverFilFuncPrevXRealizado" )
 
-   deleteTmpParameters( "__TurnOverGeralFuncoes" )
+   deleteTmpParameters( "__TurnoverFilFuncPrevXRealizado" )
 
 RETURN

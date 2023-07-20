@@ -16,6 +16,8 @@ Procedure Main()
    Application:oIcon := "nefele.ico"
 
    CGI_Init()
-   Application:Run()
+   TRY
+      Application:Run()
+   END TRY
 
 Return

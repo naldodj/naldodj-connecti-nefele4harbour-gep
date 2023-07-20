@@ -2,6 +2,15 @@ SELECT
 DISTINCT  SRJ.RJ_FILIAL
          ,SRJ.RJ_FUNCAO
          ,SRJ.RJ_DESC
+         ,SRJ.RJ_XFUNAGG
+       ,(
+            SELECT SRJ_D.RJ_DESC 
+              FROM SRJ010 SRJ_D 
+             WHERE (1=1)
+               AND SRJ_D.D_E_L_E_T_=''
+               AND SRJ_D.RJ_FILIAL=SRJ.RJ_FILIAL
+               AND SRJ_D.RJ_FUNCAO=SRJ.RJ_XFUNAGG
+       ) RJ_XFUNAGD
      FROM SRJ990 SRJ 
      JOIN SRA990 SRA ON (SRJ.RJ_FUNCAO=SRA.RA_CODFUNC)
     WHERE SRJ.D_E_L_E_T_=''

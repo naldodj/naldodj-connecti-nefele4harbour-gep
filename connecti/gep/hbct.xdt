@@ -111,4 +111,6 @@ LockControls=.T.
 108=..\harbour\contrib\hbct\scrmark.prg,0,0,0,0,0,0,624
 109=..\harbour\contrib\hbct\showtime.prg,0,0,0,0,0,0,640
 110=..\harbour\contrib\hbct\tempfile.prg,14,2,14,2,9,0,600
-Current=110
+111={gep}gep\src\CadastroFuncoes.prg,428,16,428,10,455,0,1384
+112={gep}gep\lib\QueryTotvs.prg,993,0,993,0,981,0,1856
+Current=112

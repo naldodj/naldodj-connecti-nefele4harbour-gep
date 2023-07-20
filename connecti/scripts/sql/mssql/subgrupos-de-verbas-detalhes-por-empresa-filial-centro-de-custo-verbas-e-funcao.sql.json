@@ -1,6 +1,6 @@
 {
   "parameters": [
-    ["!TABLENAME!","&tmpTableUtils():tmpTableName('afxutils',.T.)"],
+    ["!TABLENAME!","&tmpTableUtils():tmpTableName('afxutils',.F.)"],
     ["SRA990","&RetSQLName('SRA')"],
     ["SRD990","&RetSQLName('SRD')"],
     ["SRV990","&RetSQLName('SRV')"],

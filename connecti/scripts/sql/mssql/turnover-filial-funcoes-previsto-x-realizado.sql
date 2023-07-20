@@ -1,0 +1,154 @@
+SELECT DISTINCT ZV_.ZV__FILIAL,
+       ZV_.ZV__ANOMES,
+       ZV_.ZV__DATA,
+       SRJ.RJ_XFUNAGG ZV__CODFUN,
+       (
+            SELECT SRJ_D.RJ_DESC 
+              FROM SRJ010 SRJ_D 
+             WHERE (1=1)
+               AND SRJ_D.D_E_L_E_T_=''
+               AND SRJ_D.RJ_FILIAL=SRJ.RJ_FILIAL
+               AND SRJ_D.RJ_FUNCAO=SRJ.RJ_XFUNAGG
+       ) RJ_DESC,
+       SUM(ZV_.ZV__NRFUNP) ZV__NRFUNP,
+       (SELECT COUNT(1)
+        FROM SRA010 SRA
+   LEFT JOIN SRJ010 SRJ ON (SRA.RA_CODFUNC=SRJ.RJ_FUNCAO)
+        WHERE (1=1)
+          AND SRA.D_E_L_E_T_=''
+          AND SRJ.D_E_L_E_T_=''
+          AND SRA.RA_FILIAL=ZV_.ZV__FILIAL
+          AND SRA.RA_CODFUNC=SRJ.RJ_FUNCAO
+          AND ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG
+          AND SRJ.RJ_FILIAL=(CASE SRJ.RJ_FILIAL WHEN '' THEN '' ELSE LEFT(ZV_.ZV__FILIAL,LEN(SRJ.RJ_FILIAL)) END)
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (LEFT(SRA.RA_ADMISSA,6)<=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (SRA.RA_ADMISSA<=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+               END)=1
+          AND ((SRA.RA_DEMISSA=' ')
+               OR (CASE ZV_.ZV__DATA
+                     WHEN ''
+                     THEN (CASE WHEN (LEFT(SRA.RA_DEMISSA,6)>=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                     ELSE (CASE WHEN (SRA.RA_DEMISSA>=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+                   END)=1)
+          GROUP BY SRA.RA_FILIAL,SRJ.RJ_XFUNAGG
+       ) QTDEFUNFOL,
+       (SELECT COUNT(1)
+        FROM SRA010 SRA
+        LEFT JOIN SR8010 SR8 ON (SR8.R8_FILIAL=SRA.RA_FILIAL AND SR8.R8_MAT=SRA.RA_MAT)
+        LEFT JOIN SRJ010 SRJ ON (SRA.RA_CODFUNC=SRJ.RJ_FUNCAO)
+        WHERE (1=1)
+          AND SRA.D_E_L_E_T_=''
+          AND SR8.D_E_L_E_T_=''
+          AND SRJ.D_E_L_E_T_=''
+          AND SRA.RA_FILIAL=ZV_.ZV__FILIAL
+          AND SRA.RA_CODFUNC=SRJ.RJ_FUNCAO
+          AND ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG
+          AND SRJ.RJ_FILIAL=(CASE SRJ.RJ_FILIAL WHEN '' THEN '' ELSE LEFT(ZV_.ZV__FILIAL,LEN(SRJ.RJ_FILIAL)) END)
+          AND SR8.R8_FILIAL=SRA.RA_FILIAL
+          AND SR8.R8_MAT=SRA.RA_MAT
+          AND SR8.R8_TIPOAFA='001'
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (LEFT(SRA.RA_ADMISSA,6)<=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (SRA.RA_ADMISSA<=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+               END)=1
+          AND ((SRA.RA_DEMISSA=' ')
+               OR (CASE ZV_.ZV__DATA
+                     WHEN ''
+                     THEN (CASE WHEN (LEFT(SRA.RA_DEMISSA,6)>=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                     ELSE (CASE WHEN (SRA.RA_DEMISSA>=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+                   END)=1)
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (ZV_.ZV__ANOMES BETWEEN LEFT(SR8.R8_DATAINI,6) AND LEFT(SR8.R8_DATAFIM,6)) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (ZV_.ZV__DATA BETWEEN SR8.R8_DATAINI AND SR8.R8_DATAFIM) THEN 1 ELSE 0 END)
+               END)=1
+          GROUP BY SRA.RA_FILIAL,SRJ.RJ_XFUNAGG
+       ) QTDEFUNFER,
+       (SELECT COUNT(1)
+        FROM SRA010 SRA
+        LEFT JOIN SR8010 SR8 ON (SR8.R8_FILIAL=SRA.RA_FILIAL AND SR8.R8_MAT=SRA.RA_MAT)
+        LEFT JOIN SRJ010 SRJ ON (SRA.RA_CODFUNC=SRJ.RJ_FUNCAO)
+        WHERE (1=1)
+          AND SRA.D_E_L_E_T_=''
+          AND SR8.D_E_L_E_T_=''
+          AND SRJ.D_E_L_E_T_=''
+          AND SRA.RA_FILIAL=ZV_.ZV__FILIAL
+          AND SRA.RA_CODFUNC=SRJ.RJ_FUNCAO
+          AND ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG
+          AND SRJ.RJ_FILIAL=(CASE SRJ.RJ_FILIAL WHEN '' THEN '' ELSE LEFT(ZV_.ZV__FILIAL,LEN(SRJ.RJ_FILIAL)) END)
+          AND SR8.R8_FILIAL=SRA.RA_FILIAL
+          AND SR8.R8_MAT=SRA.RA_MAT
+          AND SR8.R8_TIPOAFA<>'001'
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (LEFT(SRA.RA_ADMISSA,6)<=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (SRA.RA_ADMISSA<=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+               END)=1
+          AND ((SRA.RA_DEMISSA=' ')
+               OR (CASE ZV_.ZV__DATA
+                     WHEN ''
+                     THEN (CASE WHEN (LEFT(SRA.RA_DEMISSA,6)>=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                     ELSE (CASE WHEN (SRA.RA_DEMISSA>=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+                   END)=1)
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (ZV_.ZV__ANOMES BETWEEN LEFT(SR8.R8_DATAINI,6) AND LEFT(SR8.R8_DATAFIM,6)) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (ZV_.ZV__DATA BETWEEN SR8.R8_DATAINI AND SR8.R8_DATAFIM) THEN 1 ELSE 0 END)
+               END)=1
+            GROUP BY SRA.RA_FILIAL,SRJ.RJ_XFUNAGG
+       ) QTDEFUNAFA,
+       (SELECT COUNT(1)
+        FROM SRA010 SRA
+        LEFT JOIN SRJ010 SRJ ON (SRA.RA_CODFUNC=SRJ.RJ_FUNCAO)
+        WHERE (1=1)
+          AND SRA.D_E_L_E_T_=''
+          AND SRJ.D_E_L_E_T_=''
+          AND SRA.RA_FILIAL=ZV_.ZV__FILIAL
+          AND SRA.RA_CODFUNC=SRJ.RJ_FUNCAO
+          AND ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG
+          AND SRJ.RJ_FILIAL=(CASE SRJ.RJ_FILIAL WHEN '' THEN '' ELSE LEFT(ZV_.ZV__FILIAL,LEN(SRJ.RJ_FILIAL)) END)
+          AND (CASE ZV_.ZV__DATA
+                 WHEN ''
+                 THEN (CASE WHEN (LEFT(SRA.RA_ADMISSA,6)<=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                 ELSE (CASE WHEN (SRA.RA_ADMISSA<=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+               END)=1
+          AND ((SRA.RA_DEMISSA=' ')
+               OR (CASE ZV_.ZV__DATA
+                     WHEN ''
+                     THEN (CASE WHEN (LEFT(SRA.RA_DEMISSA,6)>=ZV_.ZV__ANOMES) THEN 1 ELSE 0 END)
+                     ELSE (CASE WHEN (SRA.RA_DEMISSA>=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+                   END)=1)
+          AND EXISTS ( SELECT 
+                     DISTINCT 1 
+                        FROM SP8010 SP8 
+                       WHERE SP8.D_E_L_E_T_=' ' 
+                         AND SP8.P8_FILIAL=SRA.RA_FILIAL 
+                         AND SP8.P8_MAT=SRA.RA_MAT
+                         AND (CASE ZV_.ZV__DATA
+                            WHEN ''
+                            THEN (CASE WHEN (LEFT(SP8.P8_DATA,6)=ZV_.ZV__ANOMES)  THEN 1 ELSE 0 END)
+                            ELSE (CASE WHEN (SP8.P8_DATA=ZV_.ZV__DATA) THEN 1 ELSE 0 END)
+                        END)=1)
+            GROUP BY SRA.RA_FILIAL,SRJ.RJ_XFUNAGG
+       ) QTDEFUNPON
+FROM ZV_010 ZV_
+LEFT JOIN SRJ010 SRJ ON (ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG)
+WHERE (1=1)
+  AND ZV_.D_E_L_E_T_=''
+  AND SRJ.D_E_L_E_T_=''
+  AND ZV_.ZV__CODFUN=SRJ.RJ_XFUNAGG
+  AND SRJ.RJ_FILIAL=(CASE SRJ.RJ_FILIAL WHEN '' THEN '' ELSE LEFT(ZV_.ZV__FILIAL,LEN(SRJ.RJ_FILIAL)) END)
+  AND ZV_.ZV__FILIAL BETWEEN !FILIALDE! AND !FILIALATE!
+  AND SRJ.RJ_XFUNAGG BETWEEN !FUNCAOAGRDE! AND !FUNCAOAGRATE!
+  AND ZV_.ZV__CODFUN BETWEEN !FUNCAOAGRDE! AND !FUNCAOAGRATE!
+  AND ZV_.ZV__ANOMES BETWEEN !DATARQDE! AND !DATARQATE!
+GROUP BY ZV_.ZV__FILIAL,
+         ZV_.ZV__ANOMES,
+         ZV_.ZV__DATA,
+         SRJ.RJ_FILIAL,
+         SRJ.RJ_XFUNAGG,
+         ZV_.ZV__CODFUN,
+         SRJ.RJ_DESC

@@ -58,10 +58,10 @@ METHOD CREATE() CLASS zJQueryDatePicker
 
       AAdd( :aHeadLinks, '<!-- https://code.jquery.com/ -->' )
       AAdd( :aHeadLinks, '<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>' )
-      AAdd( :aHeadLinks, '<!-- https://releases.jquery.com/ui/ -->' )
-      AAdd( :aHeadLinks, '<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" integrity="sha256-eTyxS0rkjpLEo16uXTS0uVCS4815lc40K2iVpWDvdSY=" crossorigin="anonymous"></script>' )
-      AAdd( :aHeadLinks, '<!-- Themes => https://releases.jquery.com/ui/  -->' )
-      AAdd( :aHeadLinks, '<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">' )
+      AAdd( :aHeadLinks, '<!-- https://cdnjs.com/libraries/jqueryui -->' )
+      AAdd( :aHeadLinks, '<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>' )
+      AAdd( :aHeadLinks, '<!-- Themes => https://cdnjs.com/libraries/jqueryui  -->' )
+      AAdd( :aHeadLinks, '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" integrity="sha512-ELV+xyi8IhEApPS/pSj66+Jiw+sOT1Mqkzlh8ExXihe4zfqbWkxPRi8wptXIO9g73FSlhmquFlUOuMSoXz5IRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />' )
 
       :cCSS += cDatePickerCSS()
 
@@ -164,7 +164,7 @@ METHOD Script() CLASS zJQueryDatePicker
 
       // Load the script
       const script= document.createElement("script");
-      script.src='https://code.jquery.com/ui/1.13.0/jquery-ui.min.js';
+      script.src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js';
       script.type='text/javascript';
       script.addEventListener('load', () => {
 
@@ -229,7 +229,7 @@ METHOD Script() CLASS zJQueryDatePicker
 
    cHTMLScript:=strTran(cHTMLScript,"@tabIndex@",HB_NToS(++tabIndex))
 
-return cHtmlScript
+return cHTMLScript
 
 //------------------------------------------------------------------------------
 

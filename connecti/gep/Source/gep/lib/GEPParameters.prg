@@ -58,7 +58,7 @@ PROCEDURE GEPParametersShow()
 
       AppMenu( :WO, AppData:AppName, hUser, .F. )
 
-      aParameters := { "codFilial", "codPeriodo", "codGrupo", "codCentroDeCusto", "codVerba", "codFuncao" }
+      aParameters := { "codFilial", "codPeriodo", "codGrupo", "codCentroDeCusto", "codVerba", "codFuncao" , "codAgrFuncao" }
       GEPParameters( :WO, @cIDParameters, "__GEPParameters", aParameters, .T., cSubTitle, .T. ):Create()
 
       :lValign    := .F.
@@ -279,6 +279,22 @@ FUNCTION GEPParameters( oWO, cID, cAction, aParameters, lNoStyle, cSubTitle, lFl
                :Create()
             END WITH
          ENDIF
+         IF ( GEPHasParameter( aParameters,"codAgrFuncao" ) )
+            WITH Object WComboBox():New( oWForm )
+               :cID := ( cIDParameters + "_codAgrFuncao" )
+               :AddParam( { :cID, "#" + :cID + ":selected" } )
+               :cTitle := "Agr.Funcao"
+               :cText  := "Selecione um Agr.Funcao"
+               //https://materializecss.com/icons.html
+               :oIcon:cIcon  := "work"
+               :cHelp  := "Este parametro sera utilizado para Filtrar o Agr.Funcao"
+               :aItems := GEPParametersGetAgrFuncoes()
+               :cSelected := oCGI:GetUserData( "__GEPParameters:codAgrFuncao", :aItems[ 1 ][ 2 ] )
+               :lCompress := .T.
+               :lCompressList := .T.
+               :Create()
+            END WITH
+         ENDIF
          WITH Object WButton():New( oWForm )
             :cID := ( cIDParameters + "_submit" )
             :cText := "OK"
@@ -324,7 +340,7 @@ FUNCTION GEPParametersGetFiliais( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -355,7 +371,7 @@ FUNCTION GEPParametersGetPeriodos( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -397,7 +413,7 @@ FUNCTION GEPParametersGetCentrodeCusto( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -428,7 +444,7 @@ FUNCTION GEPParametersGetGruposMaster( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -459,7 +475,7 @@ FUNCTION GEPParametersGetGrupos( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -490,7 +506,7 @@ FUNCTION GEPParametersGetVerbas( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -521,7 +537,7 @@ FUNCTION GEPParametersGetFuncoes( lUseCachedParameters )
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    hb_default( AppData:cEmp, "" )
 
-   cFile := ( AppData:RootPath + "data\" + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
    cFile := StrTran( cFile, ".json", "_dataparameters.json" )
    IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
       hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
@@ -537,6 +553,39 @@ FUNCTION GEPParametersGetFuncoes( lUseCachedParameters )
 
 return( aSource )
 
+FUNCTION GEPParametersGetAgrFuncoes( lUseCachedParameters )
+
+   LOCAL aSource := Array( 0 )
+
+   LOCAL cFile
+   LOCAL xData
+
+   LOCAL nRow
+   LOCAL nRows
+
+   hb_default( @lUseCachedParameters, .T. )
+
+   AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
+   hb_default( AppData:cEmp, "" )
+
+   cFile := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + ".json" )
+   cFile := StrTran( cFile, ".json", "_dataparameters.json" )
+   IF ( File( cFile ) .AND. ( lUseCachedParameters .AND. ( (__nfl_FileDate_NotChk__ ) .OR. nfl_FileDate(cFile ) == Date() ) ) )
+      hb_jsonDecode( hb_MemoRead( cFile ), @aSource )
+   ELSE
+      AAdd( aSource, { "", "Todos(as)" } )
+      xData := GetDataCadastroFuncoes( .F., .T., "" )
+      nRows := Len( xData[ "data" ] )
+      FOR nRow := 1 TO nRows
+         IF (aScan(aSource,{|x|x[1]==xData[ "data" ][ nRow ][ "codAgrFuncao" ]})==0)
+            AAdd( aSource, { xData[ "data" ][ nRow ][ "codAgrFuncao" ], xData[ "data" ][ nRow ][ "codAgrFuncao" ] + "-" + xData[ "data" ][ nRow ][ "descAgrFuncao" ] } )
+         ENDIF
+      NEXT nRow
+      hb_MemoWrit( cFile, hb_jsonEncode( aSource ) )
+   ENDIF
+
+return( aSource )
+
 FUNCTION hGEPParameters()
 
    LOCAL hGEPParameter := { => }
@@ -545,6 +594,7 @@ FUNCTION hGEPParameters()
    hGEPParameter[ "codVerba" ] := ""
    hGEPParameter[ "codFilial" ] := ""
    hGEPParameter[ "codFuncao" ] := ""
+   hGEPParameter[ "codAgrFuncao" ] := ""
    hGEPParameter[ "codPeriodo" ] := ""
    hGEPParameter[ "codPeriodoAte" ] := ""
    hGEPParameter[ "codCentroDeCusto" ] := ""
@@ -766,6 +816,14 @@ FUNCTION setParModel( hFilter )
    ELSE
       AAdd( hParModel[ "parameters" ], { "!FUNCAODE!", "''" } )
       AAdd( hParModel[ "parameters" ], { "!FUNCAOATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "'" + hFilter[ "codAgrFuncao" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'" + IF( Empty(hFilter[ "codAgrFuncao" ] ),"z",hFilter[ "codAgrFuncao" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'z'" } )
    ENDIF
 
    IF ( hb_HHasKey( hFilter,"codMatricula" ) )

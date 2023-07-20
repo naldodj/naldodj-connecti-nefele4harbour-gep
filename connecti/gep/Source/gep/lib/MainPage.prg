@@ -61,11 +61,11 @@ RETURN
 // Aquí contruyo el wRebar y el wSideNav,al estar en un PROCEDURE aparte puedo crearlos dentro de cualquiera de
 // las tWebPage del proyecto
 // Necesito tWebPage donde he de crearlos,asi que se lo paso como parametro en oParent
-PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge)
+PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge,lWSideNav)
 
    LOCAL cCSS
-   LOCAL cEmp := oCGI:GetUserData("cEmp",AppData:cEmp)
-   LOCAL aEmp := GetEmp(cEmp)
+   LOCAL cEmp
+   LOCAL aEmp
    LOCAL cCopyright
 
    DEFAULT cTitle TO AppData:AppName
@@ -101,217 +101,224 @@ PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge)
       ENDIF
    END WITH
 
-   // Instanciamos el wSideNav (El menú lateral)
-   //https://materializecss.com/icons.html
-   //https://fonts.google.com/icons
-   WITH object WSideNav():New(oParent)
+   HB_Default(@lWSideNav,.T.)
 
-      //BackGround Color dos Itens
-      cCSS:="ul {background-color:#012444 !important;}"
-      if !(cCSS$:cCSS)
-         :cCSS+=cCSS
-      endif
+   IF (lWSideNav)
 
-      //Alinhamento da Imagem de Titulo
-      cCSS :="#menu_imagetitle {text-align: left !important;}"
-      if !(cCSS$:cCSS)
-         :cCSS+=cCSS
-      endif
+      cEmp := oCGI:GetUserData("cEmp",AppData:cEmp)
+      aEmp := GetEmp(cEmp)
 
-      //Tamanho da Linha entre a Imagem de Titulo de o Nome do Usuario
-      cCSS :=".sidenav li { line-height: 2px !important;}"
-      if !(cCSS$:cCSS)
-         :cCSS+=cCSS
-      endif
+      // Instanciamos el wSideNav (El menú lateral)
+      //https://materializecss.com/icons.html
+      //https://fonts.google.com/icons
+      WITH object WSideNav():New(oParent)
 
-      //Largura do Menu
-      cCSS :=".sidenav { width: 350px !important;}"
-      if !(cCSS$:cCSS)
-         :cCSS+=cCSS
-      endif
+         //BackGround Color dos Itens
+         cCSS:="ul {background-color:#012444 !important;}"
+         if !(cCSS$:cCSS)
+            :cCSS+=cCSS
+         endif
 
-      :oStyle:cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif"
+         //Alinhamento da Imagem de Titulo
+         cCSS :="#menu_imagetitle {text-align: left !important;}"
+         if !(cCSS$:cCSS)
+            :cCSS+=cCSS
+         endif
 
-      // Como todas las propiedades image de Néfele podemos asiganerle una URL,un path de nuestro Apache o un BASE64
-      :cImageTitle  := "./connecti/resource/images/connecti-consultoria-150x45-white.png"
-      :oStyleTitle:cText_align:=xc_Left
+         //Tamanho da Linha entre a Imagem de Titulo de o Nome do Usuario
+         cCSS :=".sidenav li { line-height: 2px !important;}"
+         if !(cCSS$:cCSS)
+            :cCSS+=cCSS
+         endif
 
-      :cId          := "Menu"
-      :lShadowSheet := .T.
-      :lCompress    := .T.
+         //Largura do Menu
+         cCSS :=".sidenav { width: 350px !important;}"
+         if !(cCSS$:cCSS)
+            :cCSS+=cCSS
+         endif
 
-      :cBackgroundColor := "#012444"
-      :cClrText := "#E1D9D1"
+         :oStyle:cFont_family:="'Helvetica Neue','Helvetica',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif"
 
-      :AddHeader(hUser[ "name" ],"#012444","#E1D9D1")
+         // Como todas las propiedades image de Néfele podemos asiganerle una URL,un path de nuestro Apache o un BASE64
+         :cImageTitle  := "./connecti/resource/images/connecti-consultoria-150x45-white.png"
+         :oStyleTitle:cText_align:=xc_Left
 
-      :AddDivider("#12BAEB")
+         :cId          := "Menu"
+         :lShadowSheet := .T.
+         :lCompress    := .T.
 
-      IF (!Empty(aEmp))
-         :AddHeader(aEmp[ 2 ],"#012444","#E1D9D1")
+         :cBackgroundColor := "#012444"
+         :cClrText := "#E1D9D1"
+
+         :AddHeader(hUser[ "name" ],"#012444","#E1D9D1")
+
+         :AddDivider("#12BAEB")
+
+         IF (!Empty(aEmp))
+            :AddHeader(aEmp[ 2 ],"#012444","#E1D9D1")
+            :AddDivider("#17202A")
+         ENDIF
+
+         :AddItem(Lang(LNG_INICIO),"MainFunction","home",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+
          :AddDivider("#17202A")
-      ENDIF
 
-      :AddItem(Lang(LNG_INICIO),"MainFunction","home",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         IF (hUser["adminuser"])
+            :AddItem(Lang(LNG_USUARIOS),"Usuarios","people",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddDivider("#17202A")
+         ENDIF
 
-      :AddDivider("#17202A")
+         :AddSubMenu("Parâmetros",/*aBadge*/,"settings"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddItem("Parâmetros","GEPParametersShow","settings",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         :EndSubMenu()
 
-      IF (hUser["adminuser"])
-         :AddItem(Lang(LNG_USUARIOS),"Usuarios","people",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
          :AddDivider("#17202A")
-      ENDIF
 
-      :AddSubMenu("Parâmetros",/*aBadge*/,"settings"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Parâmetros","GEPParametersShow","settings",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :AddSubMenu("Cadastros",/*aBadge*/,"storage"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddItem("Filiais","CadastroFiliais","business",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("C.Custo","CadastroCentrosDeCusto","business_center",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+      *      :AddItem("Departamentos","CadastroDepartamentos","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Funcoes","CadastroFuncoes","work",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Periodos","CadastroPeriodosSRD","date_range",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddDivider("#17202A")
+            :AddSubMenu("Verbas",/*aBadge*/,"money"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Grupos","CadastroGruposMaster","group",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("SubGrupos","CadastroGrupos","group_add",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Verbas","CadastroVerbas","attach_money",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
+         :EndSubMenu()
 
-      :AddDivider("#17202A")
+         :AddDivider("#17202A")
 
-      :AddSubMenu("Cadastros",/*aBadge*/,"storage"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+         :AddSubMenu("Consultas :: Grupo",/*aBadge*/,"group"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
 
-      :AddItem("Filiais","CadastroFiliais","business",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","CadastroCentrosDeCusto","business_center",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-*      :AddItem("Departamentos","CadastroDepartamentos","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcoes","CadastroFuncoes","work",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Periodos","CadastroPeriodosSRD","date_range",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddDivider("#17202A")
-      :AddSubMenu("Verbas",/*aBadge*/,"money"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Grupos","CadastroGruposMaster","group",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("SubGrupos","CadastroGrupos","group_add",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Verbas","CadastroVerbas","attach_money",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
-      :EndSubMenu()
+            :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Empresa","GrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial","GrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C. Custo","GrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Funcionarios","GrpMasterVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
 
-      :AddDivider("#17202A")
+            :AddDivider("#17202A")
 
-      :AddSubMenu("Consultas :: Grupo",/*aBadge*/,"group"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddSubMenu("Totais",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Empresa","TotaisGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Empresa Det","TotaisGrpMasterVerbasEmpresaDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial","TotaisGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial Det","TotaisGrpMasterVerbasFilialDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C. Custo","TotaisGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C. Custo Det","TotaisGrpMasterVerbasCentroDeCustoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
 
-      :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","GrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","GrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo","GrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","GrpMasterVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+            :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+            :AddSubMenu("Graficos",/*aBadge*/,"show_chart"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Empresa","TotaisGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial","ChartTotaisGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C.Custo","ChartTotaisGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
 
-      :AddSubMenu("Totais",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","TotaisGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Empresa Det","TotaisGrpMasterVerbasEmpresaDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","TotaisGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial Det","TotaisGrpMasterVerbasFilialDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo","TotaisGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo Det","TotaisGrpMasterVerbasCentroDeCustoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+            :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+            :AddSubMenu("Provisões",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Empresa","PainelGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial","PainelGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C. Custo","PainelGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Funcionarios","PainelGrpMasterVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
 
-      :AddSubMenu("Graficos",/*aBadge*/,"show_chart"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","TotaisGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","ChartTotaisGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","ChartTotaisGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+            :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+            :AddSubMenu("Consultas :: SubGrupo",/*aBadge*/,"group_add"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
 
-      :AddSubMenu("Provisões",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","PainelGrpMasterVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","PainelGrpMasterVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo","PainelGrpMasterVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","PainelGrpMasterVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+               :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+                  :AddItem("Empresa","GrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Filial","GrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("C.Custo","GrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Verbas","GrpVerbasVerbas","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcao","GrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcionarios","GrpVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :EndSubMenu()
 
-      :EndSubMenu()
+               :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+               :AddSubMenu("Totais",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+                  :AddItem("Empresa","TotaisGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Empresa Det","TotaisGrpVerbasEmpresaDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Filial","TotaisGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Filial Det","TotaisGrpVerbasFilialDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("C.Custo","TotaisGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("C.Custo Det","TotaisGrpVerbasCentroDeCustoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcao","TotaisGrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcao Det","TotaisGrpVerbasFuncaoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :EndSubMenu()
 
-      :AddSubMenu("Consultas :: SubGrupo",/*aBadge*/,"group_add"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddDivider("#17202A")
 
-      :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddSubMenu("Graficos",/*aBadge*/,"show_chart"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+                  :AddItem("Empresa","TotaisGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Filial","ChartTotaisGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("C.Custo","ChartTotaisGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcao","ChartTotaisGrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :EndSubMenu()
 
-      :AddItem("Empresa","GrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","GrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","GrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Verbas","GrpVerbasVerbas","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcao","GrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","GrpVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddDivider("#17202A")
 
-      :EndSubMenu()
+               :AddSubMenu("Provisões",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+                  :AddItem("Empresa","PainelGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Filial","PainelGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("C.Custo","PainelGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+                  :AddItem("Funcionarios","PainelGrpVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :EndSubMenu()
 
-      :AddDivider("#17202A")
+            :EndSubMenu()
 
-      :AddSubMenu("Totais",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","TotaisGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Empresa Det","TotaisGrpVerbasEmpresaDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","TotaisGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial Det","TotaisGrpVerbasFilialDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","TotaisGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo Det","TotaisGrpVerbasCentroDeCustoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcao","TotaisGrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcao Det","TotaisGrpVerbasFuncaoDet","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :EndSubMenu()
 
-      :AddDivider("#17202A")
+         :AddDivider("#17202A")
 
-      :AddSubMenu("Graficos",/*aBadge*/,"show_chart"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","TotaisGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","ChartTotaisGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","ChartTotaisGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcao","ChartTotaisGrpVerbasFuncao","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :AddSubMenu("Consultas :: Grupo & SubGrupo",/*aBadge*/,"view_compact"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+               :AddItem("Empresa","GrpMasterDetailVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Filial","GrpMasterDetailVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("C.Custo","GrpMasterDetailVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+               :AddItem("Funcionarios","GrpMasterDetailVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :EndSubMenu()
+         :EndSubMenu()
 
-      :AddDivider("#17202A")
+         :AddDivider("#17202A")
 
-      :AddSubMenu("Provisões",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","PainelGrpVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","PainelGrpVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","PainelGrpVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","PainelGrpVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :AddSubMenu("Consultas :: Acumulados Grupo",/*aBadge*/,"group"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddItem("Empresa","GrpMasterVerbasAcumuladosEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Filial","GrpMasterVerbasAcumuladosFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("C. Custo","GrpMasterVerbasAcumuladosCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Funcionarios","GrpMasterVerbasAcumuladosFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         :EndSubMenu()
 
-      :EndSubMenu()
+         :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+         :AddSubMenu("Consultas :: TurnOver Geral",/*aBadge*/,"import_export"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
+            :AddItem("Empresa","TurnOverGeralEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Filial","TurnOverGeralFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("C. Custo","TurnOverGeralCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Funções","TurnOverGeralFuncoes","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Funcionários","TurnOverGeralFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+            :AddItem("Previsto x Realizado","TurnoverFilFuncPrevXRealizado","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         :EndSubMenu()
 
-      :AddSubMenu("Consultas :: Grupo & SubGrupo",/*aBadge*/,"view_compact"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddSubMenu("Detalhes",/*aBadge*/,/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","GrpMasterDetailVerbasEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","GrpMasterDetailVerbasFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C.Custo","GrpMasterDetailVerbasCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","GrpMasterDetailVerbasFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
-      :EndSubMenu()
+         :AddDivider("#17202A")
 
-      :AddDivider("#17202A")
+         :AddItem("Sobre","About","info",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
 
-      :AddSubMenu("Consultas :: Acumulados Grupo",/*aBadge*/,"group"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","GrpMasterVerbasAcumuladosEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","GrpMasterVerbasAcumuladosFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo","GrpMasterVerbasAcumuladosCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionarios","GrpMasterVerbasAcumuladosFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :AddDivider("#12BAEB")
 
-      :AddDivider("#17202A")
+         :AddItem(Lang(LNG_LOGOUT),"LogOut","exit_to_app",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
 
-      :AddSubMenu("Consultas :: TurnOver Geral",/*aBadge*/,"import_export"/*cIcon*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lOpen*/)
-      :AddItem("Empresa","TurnOverGeralEmpresa","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Filial","TurnOverGeralFilial","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("C. Custo","TurnOverGeralCentroDeCusto","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funções","TurnOverGeralFuncoes","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :AddItem("Funcionários","TurnOverGeralFuncionarios","",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-      :EndSubMenu()
+         :Create()
 
-      :AddDivider("#17202A")
+      END WITH
 
-      :AddItem("Sobre","About","info",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-
-      :AddDivider("#12BAEB")
-
-      :AddItem(Lang(LNG_LOGOUT),"LogOut","exit_to_app",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
-
-      :Create()
-
-   END WITH
+   ENDIF
 
    // Vamos con el wRebar
    WITH object WRebar():New(oParent)
@@ -439,6 +446,8 @@ PROCEDURE __clearUserData()
    __clearTurnOverGeralEmpresa()
    __clearTurnOverGeralFuncionarios()
    __clearTurnOverGeralCentroDeCusto()
+
+   __clearTurnoverFilFuncPrevXRealizado()
 
    oCGI:SetUserData("lGrupoHasSuper",.F.)
    oCGI:SetUserData("lGrpViewTotais",.F.)

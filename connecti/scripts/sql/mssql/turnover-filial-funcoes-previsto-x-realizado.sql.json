@@ -1,0 +1,15 @@
+{
+  "parameters": [
+    ["SRA010","&RetSQLName('SRA')"],
+    ["SR8010","&RetSQLName('SR8')"],
+    ["SRJ010","&RetSQLName('SRJ')"],
+    ["ZV_010","&RetSQLName('ZV_')"],
+    ["!EMPRESA!","&cacheData():get('AFXUTILS_PARAMETERS','!EMPRESA!','')"],
+    ["!FILIALDE!","&cacheData():get('AFXUTILS_PARAMETERS','!FILIALDE!','')"],
+    ["!FILIALATE!","&cacheData():get('AFXUTILS_PARAMETERS','!FILIALATE!','')"],
+    ["!DATARQDE!","&cacheData():get('AFXUTILS_PARAMETERS','!DATARQDE!','')"],
+    ["!DATARQATE!","&cacheData():get('AFXUTILS_PARAMETERS','!DATARQATE!','')"],
+    ["!FUNCAOAGRDE!","&cacheData():get('AFXUTILS_PARAMETERS','!FUNCAOAGRDE!','')"],
+    ["!FUNCAOAGRATE!","&cacheData():get('AFXUTILS_PARAMETERS','!FUNCAOAGRATE!','')"]
+  ]
+}

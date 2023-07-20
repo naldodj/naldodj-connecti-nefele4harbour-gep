@@ -21,19 +21,21 @@
 
 #define ZGIP_ENABLE .F.
 
-//------------------------------------------------------------------------------
-
-FUNCTION QueryCodModel(cHost,cModel,cFilter,nItems,nPag,cParModel,lGZipEnabled)
-RETURN(QueryTotvs(cHost,"codModel",nil,cModel,cFilter,nItems,nPag,cParModel,@lGZipEnabled))
+#define FIELDS_CACHE_ENABLE .T.
 
 //------------------------------------------------------------------------------
 
-FUNCTION QueryCodAlias(cHost,cAlias,cFilter,nItems,nPag,cParModel,lGZipEnabled)
-RETURN(QueryTotvs(cHost,"codAlias",cAlias,nil,cFilter,nItems,nPag,cParModel,@lGZipEnabled))
+FUNCTION QueryCodModel( cHost, cModel, cFilter, nItems, nPag, cParModel, lGZipEnabled )
+RETURN( QueryTotvs( cHost,"codModel",nil,cModel,cFilter,nItems,nPag,cParModel,@lGZipEnabled ) )
 
 //------------------------------------------------------------------------------
 
-FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZipEnabled)
+FUNCTION QueryCodAlias( cHost, cAlias, cFilter, nItems, nPag, cParModel, lGZipEnabled )
+RETURN( QueryTotvs( cHost,"codAlias",cAlias,nil,cFilter,nItems,nPag,cParModel,@lGZipEnabled ) )
+
+//------------------------------------------------------------------------------
+
+FUNCTION QueryTotvs( cHost, cRest, cAlias, cModel, cFilter, nItems, nPag, cParModel, lGZipEnabled )
 
    LOCAL oOle, hItem
    LOCAL hDatos := { "status" => 0, "message" => "", "ok" => .F., "response" => { => } }
@@ -41,18 +43,18 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
    LOCAL cTenantId
    LOCAL cParameters
    LOCAL lServerXMLHTTP
-   LOCAL nResponseCode:=0
+   LOCAL nResponseCode := 0
 
    LOCAL uURLGet
 
-   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
+   hb_default( @lGZipEnabled, ZGIP_ENABLE )
 
    AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
    AppData:cAuth := oCGI:GetUserData( "cAuth", AppData:cAuth )
    AppData:tenantId := oCGI:GetUserData( "tenantId", AppData:tenantId )
 
-   cAuth:=AppData:cAuth
-   cTenantId:=AppData:tenantId
+   cAuth := AppData:cAuth
+   cTenantId := AppData:tenantId
 
    DEFAULT nItems TO 100
    DEFAULT nPag   TO 1
@@ -65,18 +67,17 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
       cParameters += iif( cRest == "codModel", "codModel=" + cModel, "" )
       cParameters += "&PageNumber=" + Tostring( nPag )
       cParameters += "&RowspPage=" + Tostring( nItems )
-      cParameters += iif( !HB_ISNIL( cFilter )  .AND. !Empty( cFilter ), "&Filter64=" + hb_base64Encode(cFilter), "" )
+      cParameters += iif( !HB_ISNIL( cFilter )  .AND. !Empty( cFilter ), "&Filter64=" + hb_base64Encode( cFilter ), "" )
       cParameters += iif( !HB_ISNIL( cParModel ) .AND. !Empty( cParModel ), "&parModel=" + cParModel, "" )
       cParameters += "&setUTF8=true"
       cParameters += "&setNoAccent=true"
       cParameters += "&setTrimSpace=true"
-      cParameters += "&Authorization="+cAuth
 
-      cHost+="?"
-      cHost+=cParameters
+      cHost += "?"
+      cHost += cParameters
 
       TRY
-         uURLGet:=cURLGet(cHost,cModel,@nResponseCode,cAuth,cTenantId,lGZipEnabled)
+         uURLGet := cURLGet( cHost, cModel, @nResponseCode, cAuth, cTenantId, lGZipEnabled )
       END TRY
 
       /*
@@ -87,30 +88,30 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
         Server error responses (500–599)
         The status codes listed below are defined by RFC 9110.
       */
-      IF ( ( nResponseCode >= 200 ) .and. ( nResponseCode <= 299 ) )
+      IF ( ( nResponseCode >= 200 ) .AND. ( nResponseCode <= 299 ) )
 
          hDatos[ "status" ]  := nResponseCode
 
          hDatos[ "message" ] := "ok"
          hDatos[ "ok" ] := .T.
 
-         hb_jsonDecode( IF(lGZipEnabled,HB_ZUncompress(uURLGet),uURLGet), @hDatos[ "response" ]  )
+         hb_jsonDecode( IF( lGZipEnabled,hb_ZUncompress(uURLGet ),uURLGet ), @hDatos[ "response" ]  )
 
       ELSE
 
          //https://msdn.microsoft.com/es-es/library/ms535874(v=vs.85).aspx#methods
          TRY
             oOle := nfl_CreateObject( 'MSXML2.ServerXMLHTTP.6.0' )
-            lServerXMLHTTP:=.T.
+            lServerXMLHTTP := .T.
          CATCH
-            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel +".log", "MSXML2.ServerXMLHTTP.6.0:Indisponivel" )
+            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", "MSXML2.ServerXMLHTTP.6.0:Indisponivel" )
             TRY
                oOle := nfl_CreateObject( 'MSXML2.XMLHTTP' )
             CATCH
                hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", "MSXML2.XMLHTTP:Indisponivel" )
                TRY
                   oOle := nfl_CreateObject( 'Microsoft.XMLHTTP' )
-                  CATCH
+               CATCH
                   hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", "Microsoft.XMLHTTP:Indisponivel" )
                END TRY
             END TRY
@@ -118,21 +119,21 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
 
          TRY
 
-            HB_Default(@lServerXMLHTTP,.F.)
+            hb_default( @lServerXMLHTTP, .F. )
 
-            IF (lServerXMLHTTP)
-               oOle:setTimeouts(TIMEOUT_Resolve,TIMEOUT_Connect,TIMEOUT_Send,TIMEOUT_Receive)
+            IF ( lServerXMLHTTP )
+               oOle:setTimeouts( TIMEOUT_Resolve, TIMEOUT_Connect, TIMEOUT_Send, TIMEOUT_Receive )
             ENDIF
 
             oOle:Open( "GET", cHost, .F. )
-            oOle:SetRequestHeader("Content-Type", "application/json;charset=utf-8")
-            oOle:SetRequestHeader("Authorization", AppData:cAuth)
-            oOle:SetRequestHeader("tenantId", cTenantId)
+            oOle:SetRequestHeader( "Content-Type", "application/json;charset=utf-8" )
+            oOle:SetRequestHeader( "Authorization", AppData:cAuth )
+            oOle:SetRequestHeader( "tenantId", cTenantId )
 
-            IF (lGZipEnabled)
-               oOle:SetRequestHeader("Accept-Encoding", "gzip,deflate")
-               oOle:SetRequestHeader("Content-Encoding", "gzip")
-            endif
+            IF ( lGZipEnabled )
+               oOle:SetRequestHeader( "Accept-Encoding", "gzip,deflate" )
+               oOle:SetRequestHeader( "Content-Encoding", "gzip" )
+            ENDIF
 
             oOle:Send()
 
@@ -149,12 +150,12 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
             */
             IF ( ( oOle:STATUS >= 200 ) .AND. ( oOle:STATUS <= 299 ) )
                hDatos[ "ok" ] := .T.
-               hb_jsonDecode( IF(lGZipEnabled,HB_ZUncompress(oOle:ResponseText),oOle:ResponseText),  @hDatos["response"]  )
+               hb_jsonDecode( IF( lGZipEnabled,hb_ZUncompress(oOle:ResponseText ),oOle:ResponseText ),  @hDatos[ "response" ]  )
             ELSE
                hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", oOle:statusText + hb_osNewLine() + oOle:ResponseText + hb_osNewLine() + cHost )
             ENDIF
          CATCH
-            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", "Unable to connect to "+cHost )
+            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", "Unable to connect to " + cHost )
          END TRY
 
       ENDIF
@@ -167,95 +168,93 @@ FUNCTION QueryTotvs(cHost,cRest,cAlias,cModel,cFilter,nItems,nPag,cParModel,lGZi
 
 RETURN hDatos
 
+STATIC FUNCTION cURLGet( cHost, cModel, nResponseCode, cAuth, cTenantId, lGZipEnabled )
 
-static function cURLGet(cHost,cModel,nResponseCode,cAuth,cTenantId,lGZipEnabled)
+   LOCAL aHeader
 
-   local aHeader
+   LOCAL hCurl
 
-   local hCurl
+   LOCAL nError
 
-   local nError
+   LOCAL uValue
 
-   local uValue
-
-   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
+   hb_default( @lGZipEnabled, ZGIP_ENABLE )
 
    curl_global_init()
 
    TRY
 
-      if (!empty(hCurl:=curl_easy_init()))
+      IF ( !Empty( hCurl := curl_easy_init() ) )
 
-         aHeader:=Array(0)
-         aAdd(aHeader,"Content-Type: application/json;charset=utf-8")
-         IF (!Empty(cAuth))
-            aAdd(aHeader,"Authorization: "+cAuth)
+         aHeader := Array( 0 )
+         AAdd( aHeader, "Content-Type: application/json;charset=utf-8" )
+         IF ( !Empty( cAuth ) )
+            AAdd( aHeader, "Authorization: " + cAuth )
          ENDIF
-         IF (!Empty(cTenantId))
-            aAdd(aHeader,"tenantId: "+cTenantId)
+         IF ( !Empty( cTenantId ) )
+            AAdd( aHeader, "tenantId: " + cTenantId )
          ENDIF
 
-         IF (lGZipEnabled)
-            aAdd(aHeader,"Accept-Encoding: gzip,deflate")
-            aAdd(aHeader,"Content-Encoding: gzip")
-         endif
+         IF ( lGZipEnabled )
+            AAdd( aHeader, "Accept-Encoding: gzip,deflate" )
+            AAdd( aHeader, "Content-Encoding: gzip" )
+         ENDIF
 
          //If there's an authorization token, you attach it to the header like this:
-         curl_easy_setopt(hCurl,HB_CURLOPT_HTTPHEADER,aHeader)
+         curl_easy_setopt( hCurl, HB_CURLOPT_HTTPHEADER, aHeader )
 
          //Set the URL:
-         curl_easy_setopt(hCurl,HB_CURLOPT_URL,cHost)
+         curl_easy_setopt( hCurl, HB_CURLOPT_URL, cHost )
 
          //Disabling the SSL peer verification (you can use it if you have no SSL certificate yet, but still want to test HTTPS)
-         curl_easy_setopt(hCurl,HB_CURLOPT_FOLLOWLOCATION,.t.)
-         curl_easy_setopt(hCurl,HB_CURLOPT_SSL_VERIFYPEER,.f.)
-         curl_easy_setopt(hCurl,HB_CURLOPT_SSL_VERIFYHOST,.f.)
+         curl_easy_setopt( hCurl, HB_CURLOPT_FOLLOWLOCATION, .T. )
+         curl_easy_setopt( hCurl, HB_CURLOPT_SSL_VERIFYPEER, .F. )
+         curl_easy_setopt( hCurl, HB_CURLOPT_SSL_VERIFYHOST, .F. )
 
-         curl_easy_setopt(hCurl,HB_CURLOPT_NOPROGRESS,.f.)
-         curl_easy_setopt(hCurl,HB_CURLOPT_VERBOSE,.t.)
+         curl_easy_setopt( hCurl, HB_CURLOPT_NOPROGRESS, .F. )
+         curl_easy_setopt( hCurl, HB_CURLOPT_VERBOSE, .T. )
 
          //Setting the buffer
-         curl_easy_setopt(hCurl,HB_CURLOPT_DL_BUFF_SETUP)
+         curl_easy_setopt( hCurl, HB_CURLOPT_DL_BUFF_SETUP )
 
          //Setting the TimeOut
-         curl_easy_setopt(hCurl,HB_CURLOPT_TIMEOUT,TIMEOUT_Resolve)
-         curl_easy_setopt(hCurl,HB_CURLOPT_CONNECTTIMEOUT,TIMEOUT_Connect)
+         curl_easy_setopt( hCurl, HB_CURLOPT_TIMEOUT, TIMEOUT_Resolve )
+         curl_easy_setopt( hCurl, HB_CURLOPT_CONNECTTIMEOUT, TIMEOUT_Connect )
 
          //Sending the request and getting the response
-         if ((nError:=curl_easy_perform(hCurl))==HB_CURLE_OK)
-           uValue:=curl_easy_getinfo(hCurl,HB_CURLINFO_RESPONSE_CODE,@nError)
-           if (nError==HB_CURLE_OK)
-               uValue:=hb_jsonEncode(uValue)
-               nResponseCode:=Val(uValue)
-               if ( ( nResponseCode >= 200 ) .AND. ( nResponseCode <= 299 ) )
-                  uValue:=cURL_easy_dl_buff_get(hCurl)
-               endif
-           else
-               nResponseCode:=400
-               hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + HB_NToS( Seconds() ) + "_" + cModel + ".log", ProcName()+":curl_easy_perform: "+HB_NToS(nError)+hb_eol()+cHost)
-           endif
-         else
-            nResponseCode:=400
-            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + HB_NToS( Seconds() ) + "_" + cModel + ".log", ProcName()+":curl_easy_perform: "+HB_NToS(nError)+hb_eol()+cHost)
-         endif
+         IF ( ( nError := curl_easy_perform(hCurl ) ) == HB_CURLE_OK )
+            uValue := curl_easy_getinfo( hCurl, HB_CURLINFO_RESPONSE_CODE, @nError )
+            IF ( nError == HB_CURLE_OK )
+               uValue := hb_jsonEncode( uValue )
+               nResponseCode := Val( uValue )
+               IF ( ( nResponseCode >= 200 ) .AND. ( nResponseCode <= 299 ) )
+                  uValue := cURL_easy_dl_buff_get( hCurl )
+               ENDIF
+            ELSE
+               nResponseCode := 400
+               hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName() + ":curl_easy_perform: " + hb_ntos( nError ) + hb_eol() + cHost )
+            ENDIF
+         ELSE
+            nResponseCode := 400
+            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName() + ":curl_easy_perform: " + hb_ntos( nError ) + hb_eol() + cHost )
+         ENDIF
 
-      else
+      ELSE
 
-         hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName()+": Indisponivel"+hb_eol()+cHost )
+         hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName() + ": Indisponivel" + hb_eol() + cHost )
 
-      endif
+      ENDIF
 
    CATCH
 
-      hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName()+":Indisponivel" )
+      hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + cModel + ".log", ProcName() + ":Indisponivel" )
 
    END TRY
 
    //Cleaning the curl instance
    curl_global_cleanup()
 
-return(uValue)
-
+return( uValue )
 
 FUNCTION readFieldDefFromIni( codModel )
 
@@ -286,58 +285,58 @@ FUNCTION readFieldDefFromIni( codModel )
       IF ( HB_ISHASH( hIni ) )
          cFieldKey := codModel
          cFieldKey += "_Fields"
-         IF (HB_HHasKey(hIni,cFieldKey))
-             FOR EACH cField in hb_HKeys( hIni[ cFieldKey ] )
-                aFieldDef := Array( 0 )
-                cFieldName := codModel
-                cFieldName += "_"
-                cFieldName += hIni[ cFieldKey ][ cField ]
-                IF (HB_HHasKey(hIni[ cFieldKey ],cFieldName))
-                    FOR EACH cFieldKeyDef in hb_HKeys( hIni[ cFieldName ] )
-                       IF (HB_HHasKey(hIni[ cFieldName ],cFieldKeyDef))
-                           xValue := hb_HGet( hIni[ cFieldName ], cFieldKeyDef )
-                           switch Lower( xValue )
-                           CASE "true"
-                           CASE ".true."
-                           CASE ".T."
-                              xValue := .T.
-                              EXIT
-                           CASE "false"
-                           CASE ".false."
-                           CASE ".f."
-                              xValue := .F.
-                              EXIT
-                           END switch
-                           AAdd( aFieldDef, xValue )
-                       ENDIF
-                    NEXT EACH //cFieldKeyDef
-                ENDIF
-                IF ( !Empty( aFieldDef ) )
-                   AAdd( aFieldsDef, aFieldDef )
-                ENDIF
-             NEXT EACH //cField
-        ENDIF
-        IF (HB_HHasKey(hIni,"rest"))
-            IF (HB_HHasKey(hIni[ "rest" ],"jsonPath"))
-                oCGI:SetUserData(codModel+":jsonPath", hIni[ "rest" ][ "jsonPath" ] )
+         IF ( HB_HHasKey( hIni,cFieldKey ) )
+            FOR EACH cField in hb_HKeys( hIni[ cFieldKey ] )
+               aFieldDef := Array( 0 )
+               cFieldName := codModel
+               cFieldName += "_"
+               cFieldName += hIni[ cFieldKey ][ cField ]
+               IF ( HB_HHasKey( hIni[ cFieldKey ],cFieldName ) )
+                  FOR EACH cFieldKeyDef in hb_HKeys( hIni[ cFieldName ] )
+                     IF ( HB_HHasKey( hIni[ cFieldName ],cFieldKeyDef ) )
+                        xValue := hb_HGet( hIni[ cFieldName ], cFieldKeyDef )
+                        switch Lower( xValue )
+                        CASE "true"
+                        CASE ".true."
+                        CASE ".T."
+                           xValue := .T.
+                           EXIT
+                        CASE "false"
+                        CASE ".false."
+                        CASE ".f."
+                           xValue := .F.
+                           EXIT
+                        END switch
+                        AAdd( aFieldDef, xValue )
+                     ENDIF
+                  NEXT EACH //cFieldKeyDef
+               ENDIF
+               IF ( !Empty( aFieldDef ) )
+                  AAdd( aFieldsDef, aFieldDef )
+               ENDIF
+            NEXT EACH //cField
+         ENDIF
+         IF ( HB_HHasKey( hIni,"rest" ) )
+            IF ( HB_HHasKey( hIni[ "rest" ],"jsonPath" ) )
+               oCGI:SetUserData( codModel + ":jsonPath", hIni[ "rest" ][ "jsonPath" ] )
             ENDIF
-            IF (HB_HHasKey(hIni[ "rest" ],"RowspPageMax"))
-                oCGI:SetUserData(codModel+":RowspPageMax", Val( hIni[ "rest" ][ "RowspPageMax" ] ) )
+            IF ( HB_HHasKey( hIni[ "rest" ],"RowspPageMax" ) )
+               oCGI:SetUserData( codModel + ":RowspPageMax", Val( hIni[ "rest" ][ "RowspPageMax" ] ) )
             ENDIF
          ENDIF
-         IF (HB_HHasKey(hIni,"dataTable"))
-            IF (HB_HHasKey(hIni[ "dataTable" ],"fixedColumns"))
-                oCGI:SetUserData(codModel+":fixedColumns", hIni[ "dataTable" ][ "fixedColumns" ] )
+         IF ( HB_HHasKey( hIni,"dataTable" ) )
+            IF ( HB_HHasKey( hIni[ "dataTable" ],"fixedColumns" ) )
+               oCGI:SetUserData( codModel + ":fixedColumns", hIni[ "dataTable" ][ "fixedColumns" ] )
             ENDIF
          ENDIF
-         IF (HB_HHasKey(hIni,"jsonserver"))
-            IF (HB_HHasKey(hIni[ "jsonserver" ],"db"))
-                oCGI:SetUserData(codModel+":jsonServer:db", hIni[ "jsonserver" ][ "db" ] )
+         IF ( HB_HHasKey( hIni,"jsonserver" ) )
+            IF ( HB_HHasKey( hIni[ "jsonserver" ],"db" ) )
+               oCGI:SetUserData( codModel + ":jsonServer:db", hIni[ "jsonserver" ][ "db" ] )
             ENDIF
-            IF (HB_HHasKey(hIni[ "jsonserver" ],"Host"))
-                IF (!(oCGI:GetUserData(codModel+":jsonServer:Host","")=="DISABLED_JSONSERVER_HOST"))
-                  oCGI:SetUserData(codModel+":jsonServer:Host", hIni[ "jsonserver" ][ "Host" ] )
-                ENDIF
+            IF ( HB_HHasKey( hIni[ "jsonserver" ],"Host" ) )
+               IF ( !( oCGI:GetUserData(codModel + ":jsonServer:Host","" ) == "DISABLED_JSONSERVER_HOST" ) )
+                  oCGI:SetUserData( codModel + ":jsonServer:Host", hIni[ "jsonserver" ][ "Host" ] )
+               ENDIF
             ENDIF
          ENDIF
       ENDIF
@@ -346,6 +345,7 @@ FUNCTION readFieldDefFromIni( codModel )
 return( aFieldsDef )
 
 //------------------------------------------------------------------------------
+
 FUNCTION getDataFieldsDef( codModel, aFieldsADD )
 
    LOCAL aFieldsDef
@@ -378,9 +378,12 @@ FUNCTION getDataFieldsDef( codModel, aFieldsADD )
          { "Desc. Empresa Completo", "descEmpresaCompleto", .T., .T., "dt-left", .T., "@!" }, ;
          { "C.Função", "codFuncao", .T., .T., "dt-left", .T., "@!" }, ;
          { "Desc. Função", "descFuncao", .T., .T., "dt-left", .T., "@!" }, ;
+         { "Agr.Funcao", "codAgrFuncao", .T., .T., "dt-left", .T., "@!" }, ;
+         { "Dsc.Agr.Fun.", "descAgrFuncao", .T., .T., "dt-left", .T., "@!" }, ;
          { "Cod. Verba", "codVerba", .T., .T., "dt-left", .T., "@!" }, ;
          { "Desc. Verba", "descVerba", .T., .T., "dt-left", .T., "@!" }, ;
          { "Matricula", "codMatricula", .T., .T., "dt-left", .T., "@!" }, ;
+         { "Dt.Dia", "dataDia", .T., .T., "dt-center", .T., "@D" }, ;
          { "Dt.Admissão", "dataAdmissao", .T., .T., "dt-center", .T., "@D" }, ;
          { "Dt.Demissão", "dataDemissao", .T., .T., "dt-center", .T., "@D" }, ;
          { "Nome Funcionário", "nomeFuncionario", .T., .T., "dt-left", .T., "@!" }, ;
@@ -393,16 +396,22 @@ FUNCTION getDataFieldsDef( codModel, aFieldsADD )
          { "Total Provisões", "provTotal", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
          { "Valor", "valor", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
          { "Sub Total", "subTotal", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
-         { "Total", "total", .T., .T., "dt-right", .T., "@R 999,999,999.99" },;
-         { "Func.Ini.Mes", "totalFuncionariosInicioMes", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Admissões", "totalFuncionariosAdmitidos", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Func.Mes", "totalFuncionariosMes", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Demissões", "totalFuncionariosDemitidos", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Func.Fim.Mes", "totalFuncionariosFinalMes", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Trf.Saida", "totalTransferenciasSaida", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "Trf.Entrada", "totalTransferenciasEntrada", .T., .T., "dt-right", .T., "@R 999,999,999" },;
-         { "TurnOver Geral", "turnOverGeral", .T., .T., "dt-right", .T., "@R 999,999,999.99" },;
-         { "TurnOver Mov/Dem", "turnOverDemissoes", .T., .T., "dt-right", .T., "@R 999,999,999.99" };
+         { "Total", "total", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
+         { "Func.Ini.Mes", "totalFuncionariosInicioMes", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Admissões", "totalFuncionariosAdmitidos", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Func.Mes", "totalFuncionariosMes", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Demissões", "totalFuncionariosDemitidos", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Func.Fim.Mes", "totalFuncionariosFinalMes", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Trf.Saida", "totalTransferenciasSaida", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "Trf.Entrada", "totalTransferenciasEntrada", .T., .T., "dt-right", .T., "@R 999,999,999" }, ;
+         { "TurnOver Geral", "turnOverGeral", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
+         { "TurnOver Mov/Dem", "turnOverDemissoes", .T., .T., "dt-right", .T., "@R 999,999,999.99" }, ;
+         { "Qtd.Fun.PRE.", "QTDEFUNPRE", .T., .T., "dt-right", .T., "@R 9999" }, ;
+         { "Qtd.Fun.FOL.", "QTDEFUNFOL", .T., .T., "dt-right", .T., "@R 9999" }, ;
+         { "Qtd.Fun.FER.", "QTDEFUNFER", .T., .T., "dt-right", .T., "@R 9999" }, ;
+         { "Qtd.Fun.AFA.", "QTDEFUNAFA", .T., .T., "dt-right", .T., "@R 9999" }, ;
+         { "Qtd.Fun.PON.", "QTDEFUNPON", .T., .T., "dt-right", .T., "@R 9999" }, ;
+         { "Qtd.Fun.REA.", "QTDEFUNREA", .T., .T., "dt-right", .T., "@R 9999" };
          }
 
    ENDIF
@@ -424,6 +433,8 @@ FUNCTION GetDataFields( codModel, bFunction, cColsPrint, aFieldsADD )
    LOCAL aFieldsDef
 
    LOCAL cKey
+   LOCAL cCachedDataFields
+   LOCAL cGetDataFields
 
    LOCAL hData
 
@@ -431,41 +442,79 @@ FUNCTION GetDataFields( codModel, bFunction, cColsPrint, aFieldsADD )
    LOCAL nData
    LOCAL nDatas
 
-   aFieldsDef := getDataFieldsDef( codModel, aFieldsADD )
+   LOCAL hGetDataFields
 
-   aFields := Array( 0 )
+   AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
+   hb_default( AppData:cEmp, "" )
 
-   hData := Eval( bFunction )
+   cCachedDataFields := ( AppData:PathData + AppData:cEmp + "_" + Lower( ProcName() ) + "_" + codModel + ".hbserialize" )
 
-   hb_default( @cColsPrint, "" )
-
-   cColsPrint += "["
-
-   IF ( !Empty( hData["data"] ) )
-      nDatas:=Len(hData["data"])
-      for nData:=1 to nDatas
-         FOR EACH cKey IN hb_HKeys(hData["data"][nData])
-            nAT := hb_AScan( aFieldsDef, {| t | t[ 2 ] == cKey } )
-            IF ( nAT > 0 )
-               AAdd( aFields, aFieldsDef[ nAT ] )
-               IF ( aFieldsDef[ nAT ][ 6 ] )
-                  cColsPrint += hb_ntos( Len( aFields ) -1 )
-                  cColsPrint += ","
-               ENDIF
+   IF ( ( FIELDS_CACHE_ENABLE ) .AND. File( cCachedDataFields ) )
+      cGetDataFields := hb_MemoRead( cCachedDataFields )
+      IF ( !Empty( cGetDataFields ) )
+         hGetDataFields := hb_Deserialize( cGetDataFields )
+         IF ( ValType( hGetDataFields ) == "H" )
+            IF ( HB_HHasKey( hGetDataFields, "aFields" ) )
+               aFields := hGetDataFields[ "aFields" ]
             ENDIF
-         NEXT EACH
-         IF ( Right( cColsPrint,1 ) == "," )
-            cColsPrint := SubStr( cColsPrint, 1, Len( cColsPrint ) -1 )
+            IF ( HB_HHasKey( hGetDataFields, "cColsPrint" ) )
+               cColsPrint := hGetDataFields[ "cColsPrint" ]
+            ENDIF
          ENDIF
-         Exit
-      next nData
+      ENDIF
    ENDIF
 
-   cColsPrint += "]"
+   aFieldsDef := getDataFieldsDef( codModel, aFieldsADD )
+
+   IF ( Empty( aFields ) )
+
+      aFields := Array( 0 )
+
+      hData := Eval( bFunction )
+
+      cColsPrint := "["
+
+      IF ( !Empty( hData[ "data" ] ) )
+         nDatas := Len( hData[ "data" ] )
+         FOR nData := 1 TO nDatas
+            FOR EACH cKey IN hb_HKeys( hData[ "data" ][ nData ] )
+               nAT := hb_AScan( aFieldsDef, {| t | t[ 2 ] == cKey } )
+               IF ( nAT > 0 )
+                  AAdd( aFields, aFieldsDef[ nAT ] )
+                  IF ( aFieldsDef[ nAT ][ 6 ] )
+                     cColsPrint += hb_ntos( Len( aFields ) - 1 )
+                     cColsPrint += ","
+                  ENDIF
+               ENDIF
+            NEXT EACH
+            IF ( Right( cColsPrint,1 ) == "," )
+               cColsPrint := SubStr( cColsPrint, 1, Len( cColsPrint ) - 1 )
+            ENDIF
+            EXIT
+         NEXT nData
+      ENDIF
+
+      cColsPrint += "]"
+
+      IF ( ( FIELDS_CACHE_ENABLE ) .AND. ( !Empty(aFields ) ) )
+
+         hGetDataFields := { => }
+         hGetDataFields[ "aFields" ] := AClone( aFields )
+         hGetDataFields[ "cColsPrint" ] := cColsPrint
+
+         cGetDataFields := hb_Serialize( hGetDataFields )
+
+         IF ( !Empty( cGetDataFields ) )
+            hb_MemoWrit( cCachedDataFields, cGetDataFields )
+         ENDIF
+
+      ENDIF
+
+   ENDIF
 
 return( aFields )
 
-FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON,lGetFields,cFile,cParModel,lNoCacheDatos,cGrpFiles,lGZipEnabled)
+FUNCTION GetDataModel( cModel, nPage, nRecords, nDraw, cSearchFilter, aOrder, lSendJSON, lGetFields, cFile, cParModel, lNoCacheDatos, cGrpFiles, lGZipEnabled )
 
    LOCAL aRow
    LOCAL aSource
@@ -512,7 +561,7 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
 
    LOCAL uValue
 
-   HB_Default(@lGZipEnabled,ZGIP_ENABLE)
+   hb_default( @lGZipEnabled, ZGIP_ENABLE )
 
    aSource := {}
 
@@ -522,7 +571,7 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
    hResultado[ "draw" ]            := nDraw
    hResultado[ "data" ]            := aSource
 
-   lGetFull := (nRecords==(-1))
+   lGetFull := ( nRecords == ( - 1 ) )
 
    hb_default( @lGetFields, .F. )
 
@@ -588,6 +637,7 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
       hb_default( @lNoCacheDatos, .F. )
 
       lDatos := ( lDatos .AND. ( !lNoCacheDatos ) )
+      nRowspPageMax := oCGI:GetUserData( cModel + ":RowspPageMax", 10 )
 
       IF ( lDatos )
          IF ( !( lFileProtheus ) )
@@ -602,14 +652,14 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
                "ok" => .F., ;
                "response" => { => };
                }
-            nPagina := IF( lGetFull, 1, IF( nPage == 0,1,IF(Mod(nPage,10 ) == 0,((nPage / 10 ) + 1 ),nPage ) ) )
+            nPagina := IF( lGetFull, 1, IF( nPage == 0,1,IF(Mod(nPage,nRowspPageMax ) == 0,((nPage / nRowspPageMax ) + 1 ),nPage ) ) )
             FOR nFile := nPagina TO nFiles
                cFileProtheus := cPathProtheus
                cFileProtheus += aFilesProtheus[ nFile ][ F_NAME ]
-               hDatosTmp := getCachedFile(cModel,aFilesProtheus[ nFile ][ F_NAME ],cFileProtheus,lGZipEnabled)
+               hDatosTmp := getCachedFile( cModel, aFilesProtheus[ nFile ][ F_NAME ], cFileProtheus, lGZipEnabled )
                IF ( HB_ISHASH( hDatosTmp ) )
-                  IF ( hb_HHasKey( hDatos[ "response" ],"table" ) )
-                     IF ( hb_HHasKey( hDatos[ "response" ][ "table" ],"items" ) )
+                  IF ( HB_HHasKey( hDatos[ "response" ],"table" ) )
+                     IF ( HB_HHasKey( hDatos[ "response" ][ "table" ],"items" ) )
                         AEval( hDatosTmp[ "table" ][ "items" ], {| e | AAdd( hDatos[ "response" ][ "table" ][ "items" ],e ) } )
                      ELSE
                         hDatos[ "response" ][ "table" ][ "items" ] := hDatosTmp[ "table" ][ "items" ]
@@ -622,42 +672,48 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
                   EXIT
                ENDIF
             NEXT nFile
-            lDatos := ( !Empty( hDatos ) .AND. hb_HHasKey( hDatos[ "response" ],"table" ) )
+            lDatos := ( !Empty( hDatos ) .AND. HB_HHasKey( hDatos[ "response" ],"table" ) )
             IF ( lDatos )
                hDatos[ "ok" ] := .T.
                IF ( lGetFull )
-                  hDatos[ "response", "PageNumber" ] := 1
-                  hDatos[ "response", "RowspPage" ] := hDatos[ "response", "TotalPages" ]
-                  hDatos[ "response", "TotalPages" ] := 1
-                  hDatos[ "response", "hasNextPage" ] := .F.
+                  hDatos[ "response" ][ "PageNumber" ] := 1
+                  hDatos[ "response" ][ "RowspPage" ] := hDatos[ "response" ][ "TotalPages" ]
+                  hDatos[ "response" ][ "TotalPages" ] := 1
+                  hDatos[ "response" ][ "hasNextPage" ] := .F.
                ENDIF
             ENDIF
          ENDIF
       ENDIF
 
       IF ( !lDatos )
-         hDatos := QueryCodModel(AppData:cHost,cModel,cFilter,1,1,cParModel,@lGZipEnabled)
+         hDatos := QueryCodModel( AppData:cHost, cModel, cFilter, 1, 1, cParModel, @lGZipEnabled )
       ENDIF
 
       IF ( hDatos[ "ok" ] )
 
-         nRegPage := hDatos[ "response", "RowspPage" ]
-         nRegTotal := hDatos[ "response", "TotalPages" ]
-         lHasNextPage := hDatos[ "response", "hasNextPage" ]
+         IF ( HB_HHasKey( hDatos,"response" ) .and. ValType(hDatos[ "response" ] ) =="H" )
+            nRegPage := IF( HB_HHasKey( hDatos[ "response" ],"RowspPage" ), hDatos[ "response" ][ "RowspPage" ], 0 )
+            nRegTotal := IF( HB_HHasKey( hDatos[ "response" ],"TotalPages" ), hDatos[ "response" ][ "TotalPages" ], 0 )
+            lHasNextPage := IF( HB_HHasKey( hDatos[ "response" ],"hasNextPage" ), hDatos[ "response" ][ "hasNextPage" ], .F. )
+         ELSE
+            nRegPage := 0
+            nRegTotal := 0
+            lHasNextPage := .F.
+         ENDIF
 
          IF ( !lGetFields )
 
-             IF ( lGetFull )
-                nRecords := nRegTotal
-             ENDIF
+            IF ( lGetFull )
+               nRecords := nRegTotal
+            ENDIF
 
-             nPagina := ( if( nRecords == 0,0,Int(nPage / nRecords ) ) + 1 )
+            nPagina := ( if( nRecords == 0,0,Int(nPage / nRecords ) ) + 1 )
 
-             IF ( !lDatos )
-                hDatos := QueryCodModel(AppData:cHost,cModel,cFilter,nRecords,nPagina,nil,@lGZipEnabled)
-             ENDIF
+            IF ( !lDatos )
+               hDatos := QueryCodModel( AppData:cHost, cModel, cFilter, nRecords, nPagina, cParModel, @lGZipEnabled )
+            ENDIF
 
-         endif
+         ENDIF
 
          IF ( hDatos[ "ok" ] )
 
@@ -665,8 +721,6 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
                cDatos := hb_jsonEncode( hDatos )
                hb_MemoWrit( cFile, cDatos )
             ENDIF
-
-            nRowspPageMax := oCGI:GetUserData( cModel + ":RowspPageMax", 10 )
 
             hResultado[ "recordsTotal" ]    := nRegTotal
             hResultado[ "recordsFiltered" ] := IF( lGetFull, nRegTotal, IF( lHasNextPage,(nRegPage * nRegTotal ),IF(nRegPage < nRowspPageMax,(nRowspPageMax * nRegTotal ),(nRegPage * nRegTotal ) ) ) )
@@ -677,63 +731,73 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
             oCGI:SetUserData( "GetDataModel:aFieldsADD", Array( 0 ) )
 
             IF ( !lGetFields )
-                IF ( !lSearchFilter )
-                   cSearchFilter := oCGI:GetUserData( "GetDataModel:cSearchFilter", "" )
-                   cSearchFilter := Upper( AllTrim( cSearchFilter ) )
-                   IF ( "SQL:" $ cSearchFilter )
-                      cSearchFilter := ""
-                   ENDIF
-                   lSearchFilter := ( !Empty( cSearchFilter ) )
-                ENDIF
+               IF ( !lSearchFilter )
+                  cSearchFilter := oCGI:GetUserData( "GetDataModel:cSearchFilter", "" )
+                  cSearchFilter := Upper( AllTrim( cSearchFilter ) )
+                  IF ( "SQL:" $ cSearchFilter )
+                     cSearchFilter := ""
+                  ENDIF
+                  lSearchFilter := ( !Empty( cSearchFilter ) )
+               ENDIF
             ENDIF
 
-            FOR EACH hRow IN hDatos[ "response", "table", "items" ]
+            IF HB_HHasKey( hDatos, "response" ) .AND. ValType( hDatos[ "response" ] ) == "H" .AND. ;
+                  HB_HHasKey( hDatos[ "response" ], "table" ) .AND. ValType( hDatos[ "response" ][ "table" ] ) == "H" .AND. ;
+                  HB_HHasKey( hDatos[ "response" ][ "table" ], "items" ) .AND. ValType( hDatos[ "response" ][ "table" ][ "items" ] ) == "A"
 
-               hDet := { => }
+               FOR EACH hRow IN hDatos[ "response" ][ "table" ][ "items" ]
 
-               FOR EACH cKey IN hb_HKeys( hRow[ "detail", "items" ] )
-                  nFieldsDef := AScan( aFieldsDef, {| x | x[ 2 ] == cKey } )
-                  uValue := hRow[ "detail", "items", cKey ]
-                  IF ( ( nFieldsDef > 0 ) .AND. !Empty( cPicture := aFieldsDef[ nFieldsDef ][ 7 ] ) )
-                     IF ( cPicture == "@D" )
-                        setFieldAsDate( cKey )
-                        hDet[ cKey ] := Transform( SToD( uValue ), cPicture )
-                     ELSE
-                        hDet[ cKey ] := Transform( uValue, cPicture )
-                     ENDIF
-                  ELSE
-                     hDet[ cKey ] := uValue
+                  hDet := { => }
+
+                  IF HB_HHasKey( hRow, "detail" ) .AND. ValType( hRow[ "detail" ] ) == "H" .AND. ;
+                        HB_HHasKey( hRow[ "detail" ], "items" ) .AND. ValType( hRow[ "detail" ][ "items" ] ) == "H"
+
+                     FOR EACH cKey IN hb_HKeys( hRow[ "detail" ][ "items" ] )
+                        nFieldsDef := AScan( aFieldsDef, {| x | x[ 2 ] == cKey } )
+                        uValue := hRow[ "detail" ][ "items" ][ cKey ]
+                        IF ( ( nFieldsDef > 0 ) .AND. !Empty( cPicture := aFieldsDef[ nFieldsDef ][ 7 ] ) )
+                           IF ( cPicture == "@D" )
+                              setFieldAsDate( cKey )
+                              hDet[ cKey ] := Transform( SToD( uValue ), cPicture )
+                           ELSE
+                              hDet[ cKey ] := Transform( uValue, cPicture )
+                           ENDIF
+                        ELSE
+                           hDet[ cKey ] := uValue
+                        ENDIF
+                     NEXT EACH //cKey
                   ENDIF
-               NEXT EACH //cKey
 
-               lInclude := ( !lSearchFilter )
+                  lInclude := ( !lSearchFilter )
 
-               IF ( lSearchFilter )
-                  FOR nDet := 1 TO Len( hDet )
-                     lInclude := ( At( cSearchFilter,Upper(ToString(hb_HValueAt(hDet,nDet ) ) ) ) > 0 )
-                     IF ( lInclude )
-                        EXIT
-                     ENDIF
-                  NEXT nDet
-               ENDIF
+                  IF ( lSearchFilter )
+                     FOR nDet := 1 TO Len( hDet )
+                        lInclude := ( At( cSearchFilter,Upper(ToString(hb_HValueAt(hDet,nDet ) ) ) ) > 0 )
+                        IF ( lInclude )
+                           EXIT
+                        ENDIF
+                     NEXT nDet
+                  ENDIF
 
-               IF ( lInclude )
-                  AAdd( aSource, hDet )
-               ENDIF
+                  IF ( lInclude )
+                     AAdd( aSource, hDet )
+                  ENDIF
 
-            NEXT EACH //hRow
+               NEXT EACH //hRow
+
+            ENDIF
 
          ENDIF
 
       ENDIF
 
-      IF (!lGetFields)
-        aSource:=sortDataModel( aSource, aOrder )
+      IF ( !lGetFields )
+         aSource := sortDataModel( aSource, aOrder )
       ENDIF
 
-      hResultado[ "data" ]:=aSource
+      hResultado[ "data" ] := aSource
 
-      IF (lGetFields)
+      IF ( lGetFields )
          IF ( !lNoCacheDatos )
             IF ( ( !lFilter ) .AND. ( !lDatos ) )
                cDatos := hb_jsonEncode( hDatos )
@@ -744,142 +808,142 @@ FUNCTION GetDataModel(cModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSendJSON
 
    END SEQUENCE
 
-RETURN(IF(lSendJSON,hb_jsonEncode(hResultado,.F.),hResultado))
+RETURN( IF( lSendJSON,hb_jsonEncode(hResultado, .F. ),hResultado ) )
 
-static function getCachedFile(cModel,cEndPoint,cFullPathFile,lGZipEnabled)
+STATIC FUNCTION getCachedFile( cModel, cEndPoint, cFullPathFile, lGZipEnabled )
 
-    local aDisabledHosts
-    local cDisabledHosts
-    local nDisabledHosts
+   LOCAL aDisabledHosts
+   LOCAL cDisabledHosts
+   LOCAL nDisabledHosts
 
-    local cHost
-    local cJSON
-    local hJSON
+   LOCAL cHost
+   LOCAL cJSON
+   LOCAL hJSON
 
-    local cJSONServer
+   LOCAL cJSONServer
 
-    local oOle
+   LOCAL oOle
 
-    local lStatusOK:=.F.
-    local lServerXMLHTTP
+   LOCAL lStatusOK := .F.
+   LOCAL lServerXMLHTTP
 
-    local nResponseCode:=0
+   LOCAL nResponseCode := 0
 
-    HB_Default(@lGZipEnabled,ZGIP_ENABLE)
+   hb_default( @lGZipEnabled, ZGIP_ENABLE )
 
-    cJSONServer:=StrTran(oCGI:GetUserData(cModel+":jsonServer:Host",""),"DISABLED_JSONSERVER_HOST","")
+   cJSONServer := StrTran( oCGI:GetUserData( cModel + ":jsonServer:Host","" ), "DISABLED_JSONSERVER_HOST", "" )
 
-    IF (!Empty(cJSONServer))
+   IF ( !Empty( cJSONServer ) )
 
-        HB_Default(@cEndPoint,"")
+      hb_default( @cEndPoint, "" )
 
-        cHost := cJSONServer
-        cHost += cEndPoint
-        IF (right(cHost,1)!="/")
-           cHost+="/"
-        endif
-        cHost += "0"
-        cJSON:=cURLGet(cHost,cModel,@nResponseCode,NIL,NIL,lGZipEnabled)
+      cHost := cJSONServer
+      cHost += cEndPoint
+      IF ( Right( cHost,1 ) != "/" )
+         cHost += "/"
+      ENDIF
+      cHost += "0"
+      cJSON := cURLGet( cHost, cModel, @nResponseCode, NIL, NIL, lGZipEnabled )
 
-        lStatusOK:= ( !Empty(cJSON) .AND. ( nResponseCode >= 200 ) .and. ( nResponseCode <= 299 ) )
+      lStatusOK := ( !Empty( cJSON ) .AND. ( nResponseCode >= 200 ) .AND. ( nResponseCode <= 299 ) )
 
-        IF (!lStatusOK)
+      IF ( !lStatusOK )
 
-           TRY
-               oOle := nfl_CreateObject( 'MSXML2.ServerXMLHTTP.6.0' )
-               lServerXMLHTTP:=.T.
+         TRY
+            oOle := nfl_CreateObject( 'MSXML2.ServerXMLHTTP.6.0' )
+            lServerXMLHTTP := .T.
+         CATCH
+            hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_" + cEndPoint + ".log", "MSXML2.ServerXMLHTTP.6.0:Indisponivel" )
+            TRY
+               oOle := nfl_CreateObject( 'MSXML2.XMLHTTP' )
             CATCH
-               hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_"+cEndPoint+".log", "MSXML2.ServerXMLHTTP.6.0:Indisponivel" )
+               hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_" + cEndPoint + ".log", "MSXML2.XMLHTTP:Indisponivel" )
                TRY
-                  oOle := nfl_CreateObject( 'MSXML2.XMLHTTP' )
+                  oOle := nfl_CreateObject( 'Microsoft.XMLHTTP' )
                CATCH
-                  hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_"+cEndPoint+".log", "MSXML2.XMLHTTP:Indisponivel" )
-                  TRY
-                      oOle := nfl_CreateObject( 'Microsoft.XMLHTTP' )
-                  CATCH
-                     hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_"+cEndPoint+".log", "Microsoft.XMLHTTP:Indisponivel" )
-                  END TRY
+                  hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_" + cEndPoint + ".log", "Microsoft.XMLHTTP:Indisponivel" )
                END TRY
             END TRY
+         END TRY
 
-            IF (ValType(oOle)=="O")
+         IF ( ValType( oOle ) == "O" )
 
-               TRY
+            TRY
 
-                  HB_Default(@lServerXMLHTTP,.F.)
-                  IF (lServerXMLHTTP)
-                     oOle:setTimeouts(TIMEOUT_Resolve,TIMEOUT_Connect,TIMEOUT_Send,TIMEOUT_Receive)
-                  ENDIF
+               hb_default( @lServerXMLHTTP, .F. )
+               IF ( lServerXMLHTTP )
+                  oOle:setTimeouts( TIMEOUT_Resolve, TIMEOUT_Connect, TIMEOUT_Send, TIMEOUT_Receive )
+               ENDIF
 
-                  oOle:Open("GET",cHost,.F.)
+               oOle:Open( "GET", cHost, .F. )
 
-                  oOle:SetRequestHeader("Content-Type","application/json;charset=utf-8")
+               oOle:SetRequestHeader( "Content-Type", "application/json;charset=utf-8" )
 
-                  IF (lGZipEnabled)
-                     oOle:SetRequestHeader("Accept-Encoding", "gzip,deflate")
-                     oOle:SetRequestHeader("Content-Encoding", "gzip")
-                  ENDIF
+               IF ( lGZipEnabled )
+                  oOle:SetRequestHeader( "Accept-Encoding", "gzip,deflate" )
+                  oOle:SetRequestHeader( "Content-Encoding", "gzip" )
+               ENDIF
 
-                  oOle:Send()
+               oOle:Send()
 
-                  SWITCH (oOle:STATUS)
-                  CASE 200
-                  CASE 202
-                  CASE 304
-                     lStatusOK:=.T.
-                     cJSON:=oOle:ResponseText
-                     exit
-                  OTHERWISE
-                     lStatusOK:=.F.
-                  ENDSWITCH
+               SWITCH ( oOle:STATUS )
+               CASE 200
+               CASE 202
+               CASE 304
+                  lStatusOK := .T.
+                  cJSON := oOle:ResponseText
+                  EXIT
+               OTHERWISE
+                  lStatusOK := .F.
+               ENDSWITCH
 
-               CATCH
-                  hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_"+"cJSONServer_"+".log", "Unable to connect to "+cHost )
-               END TRY
+            CATCH
+               hb_MemoWrit( AppData:PathLog + ( DToS(Date() ) ) + "_" + StrTran( Time(),":","_" ) + "_" + hb_ntos( Seconds() ) + "_" + "cJSONServer_" + "cJSONServer_" + ".log", "Unable to connect to " + cHost )
+            END TRY
 
+         ENDIF
+
+      ENDIF
+
+      IF ( lStatusOK )
+         hb_jsonDecode( IF( lGZipEnabled,hb_ZUncompress(cJSON ),cJSON ), @hJSON )
+         IF ( ( HB_HHasKey(hJSON,"id" ) ) .AND. ( HB_HHasKey(hJSON,"data" ) ) )
+            IF ( hJSON[ "id" ] == 0 )
+               hJSON := hJSON[ "data" ]
+            ELSE
+               hJSON := nil
             ENDIF
-
+         ELSE
+            hJSON := nil
          ENDIF
+      ELSE
+         hJSON := nil
+      ENDIF
 
-         IF (lStatusOK)
-             hb_jsonDecode(IF(lGZipEnabled,HB_ZUncompress(cJSON),cJSON),@hJSON)
-             IF ((HB_HHasKey(hJSON,"id")).and.(HB_HHasKey(hJSON,"data")))
-                  IF (hJSON["id"]==0)
-                     hJSON:=hJSON["data"]
-                  ELSE
-                     hJSON:=nil
-                  ENDIF
-              ELSE
-                  hJSON:=nil
-              ENDIF
-           ELSE
-             hJSON:=nil
-         ENDIF
+   ENDIF
 
-    ENDIF
+   aDisabledHosts := oCGI:GetUserData( "DISABLED_JSONSERVER_HOST", Array( 0 ) )
+   cDisabledHosts := cModel + ":jsonServer:Host"
+   IF ( Empty( hJSON ) )
+      IF ( AScan( aDisabledHosts,{| c | cDisabledHosts } ) == 0 )
+         oCGI:SetUserData( cDisabledHosts, "DISABLED_JSONSERVER_HOST" )
+         AAdd( aDisabledHosts, cDisabledHosts )
+      ENDIF
+      cJSON := hb_MemoRead( cFullPathFile )
+      hb_jsonDecode( cJSON, @hJSON )
+   ELSE
+      nDisabledHosts := AScan( aDisabledHosts, {| c | cDisabledHosts } )
+      IF ( nDisabledHosts > 0 )
+         oCGI:SetUserData( cDisabledHosts, "" )
+         ADel( aDisabledHosts, nDisabledHosts )
+         ASize( aDisabledHosts, ( Len(aDisabledHosts ) - 1 ) )
+      ENDIF
+   ENDIF
+   oCGI:SetUserData( "DISABLED_JSONSERVER_HOST", aDisabledHosts )
 
-    aDisabledHosts:=oCGI:GetUserData("DISABLED_JSONSERVER_HOST",Array(0))
-    cDisabledHosts:=cModel+":jsonServer:Host"
-    IF (Empty(hJSON))
-        IF (AScan(aDisabledHosts,{|c|cDisabledHosts})==0)
-          oCGI:SetUserData(cDisabledHosts,"DISABLED_JSONSERVER_HOST")
-           AAdd(aDisabledHosts,cDisabledHosts)
-        ENDIF
-        cJSON:=HB_MemoRead(cFullPathFile)
-        hb_jsonDecode(cJSON,@hJSON)
-    ELSE
-        nDisabledHosts:=AScan(aDisabledHosts,{|c|cDisabledHosts})
-        IF (nDisabledHosts>0)
-           oCGI:SetUserData(cDisabledHosts,"")
-           ADel(aDisabledHosts,nDisabledHosts)
-           ASize(aDisabledHosts,(Len(aDisabledHosts)-1))
-        ENDIF
-    ENDIF
-    oCGI:SetUserData("DISABLED_JSONSERVER_HOST",aDisabledHosts)
+   hb_default( @hJSON, { => } )
 
-    HB_Default(@hJSON,{=>})
-
-    return(hJSON)
+return( hJSON )
 
 FUNCTION sortDataModel( aSource, aOrder, aFieldsDef )
 
@@ -894,7 +958,7 @@ FUNCTION sortDataModel( aSource, aOrder, aFieldsDef )
          lHasDate := ( Len( aSource ) >= 1 )
          lHasDate := ( lHasDate .AND. ( HB_ISHASH(aSource[ 1 ] ) ) )
          lHasDate := ( lHasDate .AND. ( !Empty(cHbHKeyAt := hb_HKeyAt(aSource[ 1 ],aOrder[ 1 ] ) ) ) )
-         lHasDate := ( lHasDate .AND. ( getFieldAsDate( cHbHKeyAt ) .or. ( Len(hb_ATokens(aSource[ 1 ][ cHbHKeyAt ],"/" ) ) == 3 ) ) )
+         lHasDate := ( lHasDate .AND. ( getFieldAsDate( cHbHKeyAt ) .OR. ( Len(hb_ATokens(aSource[ 1 ][ cHbHKeyAt ],"/" ) ) == 3 ) ) )
          IF ( aOrder[ 2 ] == "desc" )
             IF ( lHasDate )
                aSource := ASort( aSource, NIL, NIL, {| x, y | CToD( x[ hb_HKeyAt( x,aOrder[ 1 ] ) ] ) > CToD( y[ hb_HKeyAt( y,aOrder[ 1 ] ) ] ) } )
@@ -913,7 +977,7 @@ FUNCTION sortDataModel( aSource, aOrder, aFieldsDef )
 
 return( aSource )
 
-FUNCTION rebuildDataModel( xData, hFilter, lSendJSON, aOrder , hFilterBetween )
+FUNCTION rebuildDataModel( xData, hFilter, lSendJSON, aOrder, hFilterBetween )
 
    LOCAL aSource
 
@@ -937,18 +1001,22 @@ FUNCTION rebuildDataModel( xData, hFilter, lSendJSON, aOrder , hFilterBetween )
 
    nRows := Len( aSource )
 
-   HB_Default(@hFilter,{=>})
-   HB_Default(@hFilterBetween,{=>})
+   hb_default( @hFilter, { => } )
+   hb_default( @hFilterBetween, { => } )
 
    FOR EACH cKey IN hb_HKeys( hFilter )
-      IF (HB_HHasKey(hFilterBetween,cKey))
+      IF ( HB_HHasKey( hFilterBetween,cKey ) )
          xFilter := hFilterBetween[ cKey ]
-         bAscanMatch:={| h | !( h[ cKey ] >= xFilter[1] .and. h[ cKey ] <= xFilter[2] ) }
+         bAscanMatch := {| h | !( h[ cKey ] >= xFilter[ 1 ] .AND. h[ cKey ] <= xFilter[ 2 ] ) }
       ELSE
          xFilter := hFilter[ cKey ]
-         bAscanMatch:={| h | !( h[ cKey ] == xFilter ) }
+         IF ( "codFilial" == cKey )
+            bAscanMatch := {| h | !( h[ cKey ] == Left( xFilter, Len( h[ cKey ] ) ) ) }
+         ELSE
+            bAscanMatch := {| h | !( h[ cKey ] == xFilter ) }
+         ENDIF
       ENDIF
-      IF ( ( nRow := AScan(aSource,{| h | hb_HHasKey(h,cKey) } ) ) > 0 )
+      IF ( ( nRow := AScan(aSource,{| h | HB_HHasKey(h,cKey ) } ) ) > 0 )
          nRow--
          WHILE ( ( nRow := AScan(aSource,bAscanMatch,++nRow ) ) > 0 )
             ADel( aSource, nRow )
@@ -962,32 +1030,32 @@ FUNCTION rebuildDataModel( xData, hFilter, lSendJSON, aOrder , hFilterBetween )
 
 RETURN( IF( lSendJSON,hb_jsonEncode(xRebuild, .F. ),xRebuild ) )
 
-function setFieldAsDate( cField )
+FUNCTION setFieldAsDate( cField )
 
-    local aFields:=oCGI:GetUserData("FieldAsDate",nil)
+   LOCAL aFields := oCGI:GetUserData( "FieldAsDate", NIL )
 
-    HB_Default(@aFields,Array(0))
+   hb_default( @aFields, Array( 0 ) )
 
-    IF (AScan(aFields,{|e|e[1]==cField})==0)
-        AAdd(aFields,{cField,.T.})
-    ENDIF
+   IF ( AScan( aFields,{| e | e[ 1 ] == cField } ) == 0 )
+      AAdd( aFields, { cField, .T. } )
+   ENDIF
 
-    oCGI:SetUserData("FieldAsDate",aFields)
+   oCGI:SetUserData( "FieldAsDate", aFields )
 
-    return(aFields)
+return( aFields )
 
-function getFieldAsDate( cField )
+FUNCTION getFieldAsDate( cField )
 
-    local aFields:=oCGI:GetUserData("FieldAsDate",nil)
+   LOCAL aFields := oCGI:GetUserData( "FieldAsDate", NIL )
 
-    local lFieldAsDate:=.F.
+   LOCAL lFieldAsDate := .F.
 
-    local nATField
+   LOCAL nATField
 
-    HB_Default(@aFields,Array(0))
+   hb_default( @aFields, Array( 0 ) )
 
-    IF ((nATField:=AScan(aFields,{|e|e[1]==cField}))>0)
-        lFieldAsDate:=aFields[nATField][2]
-    ENDIF
+   IF ( ( nATField := AScan(aFields,{| e | e[ 1 ] == cField } ) ) > 0 )
+      lFieldAsDate := aFields[ nATField ][ 2 ]
+   ENDIF
 
-    return(lFieldAsDate)
+return( lFieldAsDate )

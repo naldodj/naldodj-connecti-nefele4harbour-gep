@@ -70,13 +70,13 @@ function totvsGetDataModelPeriod {
     [System.Object]$ini=Get-IniFile $scriptIni
 
     [int]$RowspPageMax=[int]$ini.rest.RowspPageMax
-    
+
     if ($ini.rest.TimeOutSec -eq $null) {
         $TimeOutSec = 60
     } else {
         $TimeOutSec = $ini.rest.TimeOutSec
     }
-    
+
     $Utf8NoBomEncoding=New-Object System.Text.UTF8Encoding $False
 
     $MC=Measure-Command {
@@ -208,9 +208,9 @@ function totvsGetDataModelPeriod {
         $msgProcess1=$codModel
 
         $jsonPath=$ini.rest.jsonPath
-        
+
         Clear-Variable ini
-        
+
         if (-not $jsonPath.EndsWith("\"))
         {
             $jsonPath+="\"
@@ -258,6 +258,8 @@ function totvsGetDataModelPeriod {
                 ("!VERBAATE!","'Z'"),
                 ("!FUNCAODE!","' '"),
                 ("!FUNCAOATE!","'Z'"),
+                ("!FUNCAOAGRDE!","' '"),
+                ("!FUNCAOAGRATE!","'Z'"),
                 ("!MATRICULADE!","' '"),
                 ("!MATRICULAATE!","'Z'")
             )
@@ -349,7 +351,7 @@ function totvsGetDataModelPeriod {
                     Write-Host $_
                     break
                 }
-                
+
                 Clear-Variable Body
                 Clear-Variable params
 
@@ -401,7 +403,7 @@ function totvsGetDataModelPeriod {
                 $JsonResult=($result | ConvertTo-Json -depth 100 -Compress )
 
                 [System.IO.File]::WriteAllLines($OutFile,$JsonResult,$Utf8NoBomEncoding)
-                
+
                 Clear-Variable JsonResult
 
                 if ($HasjsonServerdb){
@@ -414,7 +416,7 @@ function totvsGetDataModelPeriod {
                         id=0
                         data=$result
                     }
-                    
+
                     $jsonServerdbJSON=@{
                         $jsonServerdbEndPoint=@(
                             $jsonServerdbEndPointData
@@ -457,10 +459,10 @@ function totvsGetDataModelPeriod {
                     } else {
                         [System.IO.File]::WriteAllLines($OutFile,$jsonServerdbJSON,$Utf8NoBomEncoding)
                     }
-                    
+
                     Clear-Variable jsonServerdbEndPointData
                     Clear-Variable jsonServerdbJSON
-                    
+
                 }
 
                 if ($PageNumber -eq $result.TotalPages){
@@ -486,15 +488,20 @@ function totvsGetDataModelPeriod {
                     TimeOutSec=$TimeOutSec
                 }
 
+                Clear-Variable result
+
                 try {
-                    Clear-Variable result
                     $result=Invoke-RestMethod @params
-                    $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
                 } catch {
-                    $hasNextPage=$False
-                    Write-Host $_
+                    $hasNextPage=$false
                 }
-                
+
+                if ($result -and $result.hasNextPage){
+                    $hasNextPage=(($result.hasNextPage) -or ($PageNumber -eq $result.TotalPages))
+                } else {
+                    $hasNextPage=$false
+                }
+
                 Clear-Variable Body
                 Clear-Variable params
 

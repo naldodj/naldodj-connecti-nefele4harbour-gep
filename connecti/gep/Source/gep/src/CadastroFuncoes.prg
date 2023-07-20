@@ -439,7 +439,7 @@ STATIC FUNCTION Extraer(codModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSend
 
    AppData:cEmp:=oCGI:GetUserData("cEmp",AppData:cEmp)
    HB_Default(AppData:cEmp,"")
-   cFile:=(AppData:RootPath+"data\"+AppData:cEmp+"_"+Lower(ProcName(1))+".json")
+   cFile:=(AppData:PathData+AppData:cEmp+"_"+Lower(ProcName(1))+".json")
 
    hFilter:={=>}
 
@@ -457,7 +457,7 @@ STATIC FUNCTION Extraer(codModel,nPage,nRecords,nDraw,cSearchFilter,aOrder,lSend
          IF (!Empty(cFilter))
             cFilter+=" AND "
          endif
-         cFilter+="RJ_FILIAL='"+codFilial+"'"
+         cFilter+="RJ_FILIAL=(CASE RJ_FILIAL WHEN '' THEN '' ELSE LEFT('"+codFilial+"',LEN(RJ_FILIAL)) END)"
       ELSE
          IF (HB_HHasKey(hFilter,"codFilial"))
             HB_HDel(hFilter,"codFilial")

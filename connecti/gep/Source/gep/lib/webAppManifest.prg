@@ -3,9 +3,12 @@
 
 function webAppManifest()
 
+    local cFile:="gep.webmanifest"
     local webAppManifest
 
-    TEXT INTO webAppManifest
+    IF (!File(cFile))
+
+       TEXT INTO webAppManifest
 {
   "short_name": "PAINELRH",
   "name": "PAINELRH",
@@ -50,8 +53,10 @@ function webAppManifest()
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }
-   ENDTEXT
-
-   HB_MemoWrit("gep.webmanifest",webAppManifest)
+      ENDTEXT
+      HB_MemoWrit(cFile,webAppManifest)
+   ELSE
+      webAppManifest:=HB_MemoRead(cFile)
+   ENDIF
 
    return(webAppManifest)

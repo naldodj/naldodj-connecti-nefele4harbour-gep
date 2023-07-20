@@ -3,7 +3,7 @@
    <Type Value="lib"/>
    <Description Value="hbct"/>
    <Output Value="libhbct.a"/>
-   <XailerVersion Value="7.1"/>
+   <XailerVersion Value="8.2"/>
    <Compiler Value="Harbour"/>
    <CCompiler Value="MinGW"/>
    <Font Value="MS Sans Serif,8"/>
