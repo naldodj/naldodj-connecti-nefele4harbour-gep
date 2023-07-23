@@ -115,6 +115,9 @@ PROCEDURE CGI_Init()
    oCGI:SetUserData( "PathCfg", AppData:PathCfg )
    oCGI:SetUserData( "cPrintIMG", AppData:cPrintIMG)
 
+   //Carrega o Manifesto da Pagina
+   webAppManifest()
+
    // Ejecutamos el objecto
    oCgi:Run()
 

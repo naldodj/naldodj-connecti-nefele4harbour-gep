@@ -12,6 +12,278 @@
 
 #define __nfl_FileDate_NotChk__ (.T.)
 
+FUNCTION hGEPParameters()
+
+   LOCAL hGEPParameter := { => }
+
+   hGEPParameter[ "codGrupo" ] := ""
+   hGEPParameter[ "codVerba" ] := ""
+   hGEPParameter[ "codFilial" ] := ""
+   hGEPParameter[ "codFuncao" ] := ""
+   hGEPParameter[ "codAgrFuncao" ] := ""
+   hGEPParameter[ "codPeriodo" ] := ""
+   hGEPParameter[ "codPeriodoAte" ] := ""
+   hGEPParameter[ "codCentroDeCusto" ] := ""
+
+return( hGEPParameter )
+
+PROCEDURE __clearGEPParameters( lCleanAll )
+
+   LOCAL hGEPParameter := hGEPParameters()
+
+   LOCAL __cGEPParameter
+
+   FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
+      oCGI:SetUserData( "GEPParameters_" + __cGEPParameter, "" )
+   NEXT EACH
+
+   hb_default( @lCleanAll, stacktools():IsInCallStack( "LogOut" ) )
+
+   IF ( lCleanAll )
+
+      FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
+         oCGI:SetUserData( "__GEPParameters:" + __cGEPParameter, "" )
+      NEXT EACH
+
+      deleteTmpParameters( "__GEPParameters" )
+
+   ENDIF
+
+RETURN
+
+PROCEDURE __SetGEPParameters( hGEPParameter )
+
+   setUserDataTmpParameters( "GEPParameters"   , hGEPParameter , .T. , "_" )
+   setUserDataTmpParameters( "__GEPParameters" , hGEPParameter , .T. , ":" )
+
+RETURN
+
+FUNCTION saveTmpParameters( cParameter, hParameters )
+
+   LOCAL lRet
+
+   LOCAL cFile
+
+   BEGIN SEQUENCE
+
+      __SetGEPParameters( hParameters )
+
+      lRet := existsTmpParameters( cParameter, @cFile )
+      IF ( lRet )
+         deleteTmpParameters( cParameter )
+      ENDIF
+
+      lRet := hb_MemoWrit( cFile, hb_jsonEncode( hParameters ) )
+
+   END SEQUENCE
+
+return( lRet )
+
+FUNCTION restoreTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
+
+   LOCAL lRet
+
+   LOCAL cFile
+   LOCAL cJSON
+
+   BEGIN SEQUENCE
+
+      lRet := existsTmpParameters( cParameter, @cFile )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      cJSON := hb_MemoRead( cFile )
+
+      lRet := ( !Empty( cJSON ) )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      hb_default( @hJSON, { => } )
+      hb_jsonDecode( cJSON, @hJSON )
+
+      lRet := ( HB_ISHASH( hJSON ) )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      hb_default( @lReplaceKeyParameter, .F. )
+      hb_default( @cToken, ":" )
+
+      setUserDataTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
+
+      __SetGEPParameters( hJSON )
+
+   END SEQUENCE
+
+return( lRet )
+
+FUNCTION setUserDataTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
+
+   LOCAL cKey
+   LOCAL cKeyParameter
+
+   LOCAL xValue
+
+   LOCAL lRet := ( HB_ISHASH( hJSON ) )
+
+   IF ( lRet )
+      hb_default( @cParameter, "" )
+      hb_default( @hJSON, { => } )
+      hb_default( @lReplaceKeyParameter, .F. )
+      hb_default( @cToken, ":" )
+      FOR EACH cKey in hb_HKeys( hJSON )
+         xValue := hJSON[ cKey ]
+         oCGI:SetUserData( cKey, xValue )
+         IF ( ( lReplaceKeyParameter ) .AND. ( !Lower(cParameter ) $ Lower(cKey ) ) )
+            cKeyParameter := cParameter
+            cKeyParameter += cToken
+            cKeyParameter += cKey
+            oCGI:SetUserData( cKeyParameter, xValue )
+         ENDIF
+      NEXT EACH
+   ENDIF
+
+return( lRet )
+
+FUNCTION deleteTmpParameters( cParameter )
+
+   LOCAL lRet
+
+   LOCAL cFile
+
+   BEGIN SEQUENCE
+
+      lRet := existsTmpParameters( cParameter, @cFile )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      lRet := FErase( cFile )
+
+   END SEQUENCE
+
+return( lRet )
+
+FUNCTION existsTmpParameters( cParameter, cFile )
+
+   LOCAL lRet
+
+   BEGIN SEQUENCE
+
+      lRet := ( Type( "AppData:PathTmp" ) == "C" )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      cFile := AppData:PathTmp
+
+      hb_default( @cParameter, "" )
+      cFile += cParameter
+
+      lRet := ( Type( "oCGI:cServerSession" ) == "C" )
+      IF ( !lRet )
+         break
+      ENDIF
+
+      cFile += oCGI:cServerSession
+
+      lRet := ( File( cFile ) )
+      IF ( !lRet )
+         break
+      ENDIF
+
+   END SEQUENCE
+
+return( lRet )
+
+FUNCTION setParModel( hFilter )
+
+   LOCAL cParModel
+   LOCAL hParModel := { => }
+
+   AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
+
+   hb_default( @hFilter, { => } )
+
+   hParModel[ "parameters" ] := Array( 0 )
+
+   AAdd( hParModel[ "parameters" ], { "!EMPRESA!", "'" + AppData:cEmp + "'" } )
+
+   IF ( hb_HHasKey( hFilter,"codPeriodo" ) )
+      AAdd( hParModel[ "parameters" ], { "!DATARQDE!", "'" + hFilter[ "codPeriodo" ] + "'" } )
+      IF ( hb_HHasKey( hFilter,"codPeriodoAte" ) )
+         AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'" + IF( Empty(hFilter[ "codPeriodoAte" ] ),"z",hFilter[ "codPeriodoAte" ] ) + "'" } )
+      ELSE
+         AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'" + IF( Empty(hFilter[ "codPeriodo" ] ),"z",hFilter[ "codPeriodo" ] ) + "'" } )
+      ENDIF
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!DATARQDE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codFilial" ) )
+      AAdd( hParModel[ "parameters" ], { "!FILIALDE!", "'" + hFilter[ "codFilial" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!FILIALATE!", "'" + IF( Empty(hFilter[ "codFilial" ] ),"z",hFilter[ "codFilial" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!FILIALDE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!FILIALATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codCentroDeCusto" ) )
+      AAdd( hParModel[ "parameters" ], { "!CCDE!", "'" + hFilter[ "codCentroDeCusto" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!CCATE!", "'" + IF( Empty(hFilter[ "codCentroDeCusto" ] ),"z",hFilter[ "codCentroDeCusto" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!CCDE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!CCATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codGrupo" ) )
+      AAdd( hParModel[ "parameters" ], { "!GRUPODE!", "'" + hFilter[ "codGrupo" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!GRUPOATE!", "'" + IF( Empty(hFilter[ "codGrupo" ] ),"z",hFilter[ "codGrupo" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!GRUPODE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!GRUPOATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codFuncao" ) )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAODE!", "'" + hFilter[ "codFuncao" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOATE!", "'" + IF( Empty(hFilter[ "codFuncao" ] ),"z",hFilter[ "codFuncao" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!FUNCAODE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "'" + hFilter[ "codAgrFuncao" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'" + IF( Empty(hFilter[ "codAgrFuncao" ] ),"z",hFilter[ "codAgrFuncao" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codMatricula" ) )
+      AAdd( hParModel[ "parameters" ], { "!MATRICULADE!", "'" + hFilter[ "codMatricula" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!MATRICULAATE!", "'" + IF( Empty(hFilter[ "codMatricula" ] ),"z",hFilter[ "codMatricula" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!MATRICULADE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!MATRICULAATE!", "'z'" } )
+   ENDIF
+
+   IF ( hb_HHasKey( hFilter,"codVerba" ) )
+      AAdd( hParModel[ "parameters" ], { "!VERBADE!", "'" + hFilter[ "codVerba" ] + "'" } )
+      AAdd( hParModel[ "parameters" ], { "!VERBAATE!", "'" + IF( Empty(hFilter[ "codVerba" ] ),"z",hFilter[ "codVerba" ] ) + "'" } )
+   ELSE
+      AAdd( hParModel[ "parameters" ], { "!VERBADE!", "''" } )
+      AAdd( hParModel[ "parameters" ], { "!VERBAATE!", "'z'" } )
+   ENDIF
+
+   cParModel := hb_jsonEncode( hParModel, .F. )
+   cParModel := __base64Encode( cParModel )
+
+return( cParModel )
+
 PROCEDURE __GEPParameters( lExecute )
 
    LOCAL cGEPParameter
@@ -585,264 +857,3 @@ FUNCTION GEPParametersGetAgrFuncoes( lUseCachedParameters )
    ENDIF
 
 return( aSource )
-
-FUNCTION hGEPParameters()
-
-   LOCAL hGEPParameter := { => }
-
-   hGEPParameter[ "codGrupo" ] := ""
-   hGEPParameter[ "codVerba" ] := ""
-   hGEPParameter[ "codFilial" ] := ""
-   hGEPParameter[ "codFuncao" ] := ""
-   hGEPParameter[ "codAgrFuncao" ] := ""
-   hGEPParameter[ "codPeriodo" ] := ""
-   hGEPParameter[ "codPeriodoAte" ] := ""
-   hGEPParameter[ "codCentroDeCusto" ] := ""
-
-return( hGEPParameter )
-
-PROCEDURE __clearGEPParameters( lCleanAll )
-
-   LOCAL hGEPParameter := hGEPParameters()
-
-   LOCAL __cGEPParameter
-
-   FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
-      oCGI:SetUserData( "GEPParameters_" + __cGEPParameter, "" )
-   NEXT EACH
-
-   hb_default( @lCleanAll, stacktools():IsInCallStack( "LogOut" ) )
-
-   IF ( lCleanAll )
-
-      FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
-         oCGI:SetUserData( "__GEPParameters:" + __cGEPParameter, "" )
-      NEXT EACH
-
-      deleteTmpParameters( "__GEPParameters" )
-
-   ENDIF
-
-RETURN
-
-FUNCTION saveTmpParameters( cParameter, hParameters )
-
-   LOCAL lRet
-
-   LOCAL cFile
-
-   BEGIN SEQUENCE
-
-      lRet := existsTmpParameters( cParameter, @cFile )
-      IF ( lRet )
-         deleteTmpParameters( cParameter )
-      ENDIF
-
-      lRet := hb_MemoWrit( cFile, hb_jsonEncode( hParameters ) )
-
-   END SEQUENCE
-
-return( lRet )
-
-FUNCTION restoreTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
-
-   LOCAL lRet
-
-   LOCAL cFile
-   LOCAL cJSON
-
-   BEGIN SEQUENCE
-
-      lRet := existsTmpParameters( cParameter, @cFile )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      cJSON := hb_MemoRead( cFile )
-
-      lRet := ( !Empty( cJSON ) )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      hb_default( @hJSON, { => } )
-      hb_jsonDecode( cJSON, @hJSON )
-
-      lRet := ( HB_ISHASH( hJSON ) )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      hb_default( @lReplaceKeyParameter, .F. )
-      hb_default( @cToken, ":" )
-
-      setUserDataTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
-
-   END SEQUENCE
-
-return( lRet )
-
-FUNCTION setUserDataTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
-
-   LOCAL cKey
-   LOCAL cKeyParameter
-
-   LOCAL xValue
-
-   LOCAL lRet := ( HB_ISHASH( hJSON ) )
-
-   IF ( lRet )
-      hb_default( @cParameter, "" )
-      hb_default( @hJSON, { => } )
-      hb_default( @lReplaceKeyParameter, .F. )
-      hb_default( @cToken, ":" )
-      FOR EACH cKey in hb_HKeys( hJSON )
-         xValue := hJSON[ cKey ]
-         oCGI:SetUserData( cKey, xValue )
-         IF ( ( lReplaceKeyParameter ) .AND. ( !Lower(cParameter ) $ Lower(cKey ) ) )
-            cKeyParameter := cParameter
-            cKeyParameter += cToken
-            cKeyParameter += cKey
-            oCGI:SetUserData( cKeyParameter, xValue )
-         ENDIF
-      NEXT EACH
-   ENDIF
-
-return( lRet )
-
-FUNCTION deleteTmpParameters( cParameter )
-
-   LOCAL lRet
-
-   LOCAL cFile
-
-   BEGIN SEQUENCE
-
-      lRet := existsTmpParameters( cParameter, @cFile )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      lRet := FErase( cFile )
-
-   END SEQUENCE
-
-return( lRet )
-
-FUNCTION existsTmpParameters( cParameter, cFile )
-
-   LOCAL lRet
-
-   BEGIN SEQUENCE
-
-      lRet := ( Type( "AppData:PathTmp" ) == "C" )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      cFile := AppData:PathTmp
-
-      hb_default( @cParameter, "" )
-      cFile += cParameter
-
-      lRet := ( Type( "oCGI:cServerSession" ) == "C" )
-      IF ( !lRet )
-         break
-      ENDIF
-
-      cFile += oCGI:cServerSession
-
-      lRet := ( File( cFile ) )
-      IF ( !lRet )
-         break
-      ENDIF
-
-   END SEQUENCE
-
-return( lRet )
-
-FUNCTION setParModel( hFilter )
-
-   LOCAL cParModel
-   LOCAL hParModel := { => }
-
-   AppData:cEmp := oCGI:GetUserData( "cEmp", AppData:cEmp )
-
-   hb_default( @hFilter, { => } )
-
-   hParModel[ "parameters" ] := Array( 0 )
-
-   AAdd( hParModel[ "parameters" ], { "!EMPRESA!", "'" + AppData:cEmp + "'" } )
-
-   IF ( hb_HHasKey( hFilter,"codPeriodo" ) )
-      AAdd( hParModel[ "parameters" ], { "!DATARQDE!", "'" + hFilter[ "codPeriodo" ] + "'" } )
-      IF ( hb_HHasKey( hFilter,"codPeriodoAte" ) )
-         AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'" + IF( Empty(hFilter[ "codPeriodoAte" ] ),"z",hFilter[ "codPeriodoAte" ] ) + "'" } )
-      ELSE
-         AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'" + IF( Empty(hFilter[ "codPeriodo" ] ),"z",hFilter[ "codPeriodo" ] ) + "'" } )
-      ENDIF
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!DATARQDE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!DATARQATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codFilial" ) )
-      AAdd( hParModel[ "parameters" ], { "!FILIALDE!", "'" + hFilter[ "codFilial" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!FILIALATE!", "'" + IF( Empty(hFilter[ "codFilial" ] ),"z",hFilter[ "codFilial" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!FILIALDE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!FILIALATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codCentroDeCusto" ) )
-      AAdd( hParModel[ "parameters" ], { "!CCDE!", "'" + hFilter[ "codCentroDeCusto" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!CCATE!", "'" + IF( Empty(hFilter[ "codCentroDeCusto" ] ),"z",hFilter[ "codCentroDeCusto" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!CCDE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!CCATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codGrupo" ) )
-      AAdd( hParModel[ "parameters" ], { "!GRUPODE!", "'" + hFilter[ "codGrupo" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!GRUPOATE!", "'" + IF( Empty(hFilter[ "codGrupo" ] ),"z",hFilter[ "codGrupo" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!GRUPODE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!GRUPOATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codFuncao" ) )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAODE!", "'" + hFilter[ "codFuncao" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOATE!", "'" + IF( Empty(hFilter[ "codFuncao" ] ),"z",hFilter[ "codFuncao" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!FUNCAODE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codAgrFuncao" ) )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "'" + hFilter[ "codAgrFuncao" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'" + IF( Empty(hFilter[ "codAgrFuncao" ] ),"z",hFilter[ "codAgrFuncao" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRDE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!FUNCAOAGRATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codMatricula" ) )
-      AAdd( hParModel[ "parameters" ], { "!MATRICULADE!", "'" + hFilter[ "codMatricula" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!MATRICULAATE!", "'" + IF( Empty(hFilter[ "codMatricula" ] ),"z",hFilter[ "codMatricula" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!MATRICULADE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!MATRICULAATE!", "'z'" } )
-   ENDIF
-
-   IF ( hb_HHasKey( hFilter,"codVerba" ) )
-      AAdd( hParModel[ "parameters" ], { "!VERBADE!", "'" + hFilter[ "codVerba" ] + "'" } )
-      AAdd( hParModel[ "parameters" ], { "!VERBAATE!", "'" + IF( Empty(hFilter[ "codVerba" ] ),"z",hFilter[ "codVerba" ] ) + "'" } )
-   ELSE
-      AAdd( hParModel[ "parameters" ], { "!VERBADE!", "''" } )
-      AAdd( hParModel[ "parameters" ], { "!VERBAATE!", "'z'" } )
-   ENDIF
-
-   cParModel := hb_jsonEncode( hParModel, .F. )
-   cParModel := __base64Encode( cParModel )
-
-return( cParModel )

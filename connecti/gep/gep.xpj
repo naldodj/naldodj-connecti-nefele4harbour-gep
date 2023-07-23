@@ -29,7 +29,7 @@
    </Directories>
    <Options>
       <AutomaticMemvarDeclaration Value="N"/>
-      <DebugInfo Value="N"/>
+      <DebugInfo Value="Y"/>
       <SuppressLineNumberInformation Value="N"/>
       <SuppressShortcutting Value="N"/>
       <WarnningLevel Value="1"/>

@@ -48,7 +48,8 @@ static function inHead()
    local cInHead
    TEXT INTO cInHead
       <link href='https://fonts.googleapis.com/css2?family=Material+Icons' rel='stylesheet' />
-      <link rel='manifest' href='?webAppManifest' crossorigin='use-credentials' />
+      <link rel='manifest' href='gep.webmanifest' crossorigin='use-credentials' />
+      <!--<link rel='manifest' href='?webAppManifest' crossorigin='use-credentials' />-->
    ENDTEXT
    return(cInHead)
 

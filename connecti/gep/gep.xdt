@@ -4,7 +4,14 @@ LockControls=.F.
 BrowseState=0;
 FormCoors=0159009102A301DEn
 [DESKTOP]
-1=Main.prg,0,0,0,0,12,0,976
+1=Main.prg,117,34,117,34,102,0,976
 2=gep\lib\MainPage.prg,281,63,281,35,264,0,1648
-3=gep\src\GrpMasterDetailVerbasEmpresa.prg,12,43,12,22,0,0,1808
-Current=3
+3=gep\src\GrpMasterDetailVerbasEmpresa.prg,256,0,256,0,239,0,1808
+4=gep\src\TurnoverGeralEmpresa.prg,118,60,118,45,116,0,1224
+5=gep\src\TurnoverGeralFilial.prg,0,0,0,0,0,0,1224
+6=gep\lib\GEPParameters.prg,696,39,696,19,635,0,3328
+7=gep\lib\wTWebPage.prg,51,52,51,37,36,0,3664
+8=gep\lib\wDatatable.prg,390,198,390,198,366,598,4304
+9=gep\lib\webAppManifest.prg,3,25,3,9,0,0,800
+10=gep\lib\Login.prg,0,0,0,0,321,0,1760
+Current=5
