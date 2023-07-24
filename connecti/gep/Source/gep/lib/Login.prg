@@ -10,6 +10,8 @@
 #include "Nefele.ch"
 #include "LangCGI.ch"
 
+#define __MAXCOOKIETIME__ 99999999
+
 PROCEDURE Login( aParams )
 
    LOCAL hIni
@@ -213,7 +215,9 @@ PROCEDURE ControlAcceso()
    LOCAL cEmp  := oCgi:GetCGIValue( "cEmp", "" )
    LOCAL cUser := oCgi:GetCGIValue( "usuario", "" )
    LOCAL cPass := oCgi:GetCgiValue( "password", "" )
-   LOCAL lChkFormUID := ( oCgi:GetCgiValue( "lChkFormUID","1" ) == "1" )
+   LOCAL lChkFormUID := ( oCgi:GetCgiValue( "lChkFormUID",oCGI:GetUserData("lChkFormUID" , "1" )) == "1" )
+
+   oCGI:SetUserData("lChkFormUID",IF(lChkFormUID,"1","0"))
 
    IF ( !Empty( cEmp ) )
       AppData:cEmp := cEmp
@@ -231,6 +235,9 @@ PROCEDURE ControlAcceso()
    ELSE
       //Comprobar usuario y password
       nId := CheckUserLogin( cUser, cPass )
+      IF (!lChkFormUID)
+         oCGI:nDuracionCookie:=__MAXCOOKIETIME__
+      ENDIF
    ENDIF
 
    IF nId == 0
@@ -324,6 +331,7 @@ FUNCTION LoginUser()
 
    LOCAL oUser := oCGI:GetCodefCookie( "appccuser" )
    LOCAL cUser, hUser
+   LOCAL lChkFormUID := ( oCgi:GetCgiValue( "lChkFormUID",oCGI:GetUserData("lChkFormUID" , "1" )) == "1" )
 
    IF HB_ISNIL( oUser )
       LogOut()
@@ -333,6 +341,10 @@ FUNCTION LoginUser()
          IF HB_ISNIL( hUser := GetUser( cUser ) )
             LogOut()
          ELSE
+            lChkFormUID:=(lChkFormUID.OR.(oCGI:nDuracionCookie==__MAXCOOKIETIME__))
+            IF (lChkFormUID)
+               oCGI:nDuracionCookie:=__MAXCOOKIETIME__
+            ENDIF
             //Alimentamos una cookie con los datos de la persona validada
             //Le damos una caducidad por defecto son 5 min.
             oCGI:SendCodefCookie( "appccuser", cUser, oCGI:nDuracionCookie )

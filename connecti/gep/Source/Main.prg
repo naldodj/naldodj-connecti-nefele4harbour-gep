@@ -488,6 +488,12 @@ CLASS TCgi FROM XCgi
 
 //-------------------------------------------------------------------------------------------------
 
+   METHOD TurnOverGeralFilialDashBoard() INLINE TurnOverGeralFilialDashBoard()
+   METHOD __TurnOverGeralFilialDashBoard() INLINE __TurnOverGeralFilialDashBoard()
+   METHOD __TurnOverGeralFilialDashBoardDet() INLINE __TurnOverGeralFilialDashBoard()
+
+//-------------------------------------------------------------------------------------------------
+
    METHOD TurnoverFilFuncPrevXRealizado() INLINE ParametersTurnoverFilFuncPrevXRealizado()
    METHOD __TurnoverFilFuncPrevXRealizado() INLINE __TurnoverFilFuncPrevXRealizado()
    METHOD __TurnoverFilFuncPrevXRealizadoDet() INLINE __TurnoverFilFuncPrevXRealizado(nil,nil,-1)

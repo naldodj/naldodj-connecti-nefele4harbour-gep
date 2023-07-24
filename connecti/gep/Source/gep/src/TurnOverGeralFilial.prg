@@ -164,6 +164,7 @@ FUNCTION __TurnOverGeralFilial(lExecute,hFilter,nMaxRowspPage)
    IF ( lExecute )
       saveTmpParameters( "__TurnOverGeralCentroDeCusto", HB_HDel(hFilter,"codFilial") )
       oCGI:SetUserData( "TurnOverGeralCentroDeCusto:Back", ProcName() )
+      oCGI:SetUserData("__TurnOverGeralFilialDashBoard:Back",ProcName())
       TurnOverGeralFilial(nMaxRowspPage)
    ENDIF
 
@@ -186,10 +187,12 @@ PROCEDURE TurnOverGeralFilial(nMaxRowspPage)
 
    LOCAL cTmp
 
+   LOCAL cFilter
    LOCAL hFilter
 
    LOCAL cPrintIMG
 
+   LOCAL codFilial
    LOCAL codPeriodo
    LOCAL codPeriodoAte
 
@@ -197,7 +200,12 @@ PROCEDURE TurnOverGeralFilial(nMaxRowspPage)
 
    IF ( !stackTools():IsInCallStack( "__TurnOverGeralFilial" ) )
       hFilter:=__TurnOverGeralFilial( .F. )
+   ELSE
+      restoreTmpParameters("__TurnOverGeralFilial",@hFilter,.T.)
    ENDIF
+
+   cFilter:=HB_JsonEncode(hFilter,.F.)
+   cFilter:=__base64Encode(cFilter)
 
    WITH OBJECT wTWebPage():New()
 
@@ -422,6 +430,13 @@ PROCEDURE TurnOverGeralFilial(nMaxRowspPage)
             WITH OBject :AddButton( "Parâmetros" )
                :cAction := nfl_OpenModal( cIDParameters, .T. )
             END WITH
+
+            codFilial := oCGI:GetUserData( "__TurnOverGeralFilial:codFilial" )
+            IF (!Empty(codFilial))
+               WITH OBject :AddButton( "DashBoard" )
+                  :cAction :="autoformID('"+cFilter+"','?FUNCTION=__TurnOverGeralFilialDashBoardDet','_parent',true);"
+               END WITH
+            ENDIF
 
             :cTitle  := cTitle + tableBtnReload( :cId )
 

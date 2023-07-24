@@ -45,8 +45,6 @@ PROCEDURE __TurnOverGeralEmpresaDashBoard()
    codPeriodo := oCGI:GetUserData( "__TurnOverGeralEmpresa:codPeriodo", "" )
    codPeriodoAte := oCGI:GetUserData( "__TurnOverGeralEmpresa:codPeriodoAte", "" )
 
-   hData:=GetDataTurnOverGeralEmpresa(.F.,.T.,"")
-
    WITH OBJECT oTWebPage:=wTWebPage():New()
 
       :cCSS += "h10 {font-size: 12px; font-weight: lighter; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif; !important;}"
@@ -67,6 +65,8 @@ PROCEDURE __TurnOverGeralEmpresaDashBoard()
          :cOnClick := oCGI:GetUserData( ProcName() + ":Back", "MAINFUNCTION" )
          :Create()
       END WITH
+
+      hData:=GetDataTurnOverGeralEmpresa(.F.,.T.,"")
 
       WITH object wDashBoardTurnOver():New( oTWebPage )
          :yearDashBoard:=Left(codPeriodo,4)

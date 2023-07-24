@@ -147,7 +147,6 @@
       <File Filename="gep\src\TurnoverGeralEmpresa.prg"/>
       <File Filename="gep\src\TurnoverGeralFilial.prg"/>
       <File Filename="gep\lib\wDashBoardTurnover.prg"/>
-      <File Filename="gep\src\TurnoverGeralEmpresaDashBoard.prg"/>
       <File Filename="gep\src\TotaisGrpVerbasEmpresa.prg"/>
       <File Filename="gep\lib\wJQueryDatePicker.prg"/>
       <File Filename="gep\lib\zJQueryDatePicker.prg"/>
@@ -159,6 +158,8 @@
       <File Filename="gep\lib\zChartJS.prg"/>
       <File Filename="gep\lib\wRTabs.prg"/>
       <File Filename="gep\src\TurnoverFilFuncPrevXRealizado.prg"/>
+      <File Filename="gep\src\TurnoverGeralFilialDashBoard.prg"/>
+      <File Filename="gep\src\TurnOverGeralEmpresaDashBoard.prg"/>
    </Files>
    <Libraries>
       <Library Filename="[harbour]libcurl-4"/>

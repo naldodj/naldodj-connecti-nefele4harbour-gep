@@ -945,7 +945,7 @@ STATIC FUNCTION getCachedFile( cModel, cEndPoint, cFullPathFile, lGZipEnabled )
 
 return( hJSON )
 
-FUNCTION sortDataModel( aSource, aOrder, aFieldsDef )
+FUNCTION sortDataModel( aSource, aOrder )
 
    LOCAL lHasDate
    LOCAL cHbHKeyAt

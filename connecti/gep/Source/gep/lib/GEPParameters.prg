@@ -51,14 +51,29 @@ PROCEDURE __clearGEPParameters( lCleanAll )
 
 RETURN
 
-PROCEDURE __SetGEPParameters( hGEPParameter )
+FUNCTION SetGEPParameters( hParameters )
 
-   setUserDataTmpParameters( "GEPParameters"   , hGEPParameter , .T. , "_" )
-   setUserDataTmpParameters( "__GEPParameters" , hGEPParameter , .T. , ":" )
+   LOCAL hRetParameter := { => }
+   LOCAL hGEPParameter := hGEPParameters()
 
-RETURN
+   LOCAL __cGEPParameter
 
-FUNCTION saveTmpParameters( cParameter, hParameters )
+   LOCAL uValue
+
+   FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
+      uValue:=oCGI:GetUserData( "GEPParameters_" + __cGEPParameter, "" )
+      if Empty(uValue)
+         uValue:=oCGI:GetUserData( "__GEPParameters:" + __cGEPParameter, "" )
+      endif
+      hRetParameter[__cGEPParameter]:=uValue
+   NEXT EACH
+
+   setUserDataTmpParameters( "GEPParameters"   , hParameters , .T. , "_" )
+   setUserDataTmpParameters( "__GEPParameters" , hParameters , .T. , ":" )
+
+RETURN(hRetParameter)
+
+FUNCTION saveTmpParameters( cParameter, hParameters , hRetParameter )
 
    LOCAL lRet
 
@@ -66,7 +81,7 @@ FUNCTION saveTmpParameters( cParameter, hParameters )
 
    BEGIN SEQUENCE
 
-      __SetGEPParameters( hParameters )
+      hRetParameter:=SetGEPParameters( hParameters )
 
       lRet := existsTmpParameters( cParameter, @cFile )
       IF ( lRet )
@@ -113,7 +128,7 @@ FUNCTION restoreTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
 
       setUserDataTmpParameters( cParameter, hJSON, lReplaceKeyParameter, cToken )
 
-      __SetGEPParameters( hJSON )
+      SetGEPParameters( hJSON )
 
    END SEQUENCE
 

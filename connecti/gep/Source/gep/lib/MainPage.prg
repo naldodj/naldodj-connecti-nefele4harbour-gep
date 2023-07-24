@@ -67,6 +67,7 @@ PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge,lWSideN
    LOCAL cEmp
    LOCAL aEmp
    LOCAL cCopyright
+   LOCAL lChkFormUID := ( oCgi:GetCgiValue( "lChkFormUID",oCGI:GetUserData("lChkFormUID" , "1" )) == "1" )
 
    DEFAULT cTitle TO AppData:AppName
    DEFAULT lOpen  TO .F.
@@ -310,9 +311,10 @@ PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge,lWSideN
 
          :AddItem("Sobre","About","info",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
 
-         :AddDivider("#12BAEB")
-
-         :AddItem(Lang(LNG_LOGOUT),"LogOut","exit_to_app",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         IF (lChkFormUID)
+            :AddDivider("#12BAEB")
+            :AddItem(Lang(LNG_LOGOUT),"LogOut","exit_to_app",/*nStyle*/,/*aParams*/,/*cAction*/,/*aBadge*/,"#012444"/*cClrPane*/,"#E1D9D1"/*cClrText*/,/*lShadowSheet*/)
+         ENDIF
 
          :Create()
 
@@ -344,9 +346,9 @@ PROCEDURE AppMenu(oParent,cTitle,hUser,lOpen,lFixed,lRemoveParam,lWBadge,lWSideN
             :oIcon:cIcon:= "person"
             :oStyle:cMargin_top := ".9rem"
             :oStyle:cMargin_right := 4
-            :cToolTip := Lang(LNG_LOGOUT)
+            :cToolTip := IF(lChkFormUID,Lang(LNG_LOGOUT),:cText)
             :cClrPane := "orange"
-            :cOnClick := "logout"
+            :cOnClick := IF(lChkFormUID,"logout","MainFunction")
             :Create()
          END WITH
       ENDIF
