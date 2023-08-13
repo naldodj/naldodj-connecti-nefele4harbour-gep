@@ -31,7 +31,6 @@ RETURN aData
 FUNCTION GetUser( xUser )
    local aData := GetUsers()
    local hUser := {=>},nIdx
-
    IF ValType( xUser ) == "N"
       if Len( aData ) >= xUser
          hUser := aData[xUser]

@@ -427,7 +427,7 @@ PROCEDURE __clearUserData()
 
    __clearGrpMasterVerbasAcumuladosFuncionarios()
 
-   __clearGEPParameters()
+   __clearGEPParameters(.T.)
 
    __clearcodModelFilter()
 

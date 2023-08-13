@@ -127,8 +127,13 @@ RETURN
 // El RUN anterior entra por aquí y llama al Method correspondiente
 CLASS TCgi FROM XCgi
 
-   PROPERTY nDuracionCookie INIT 1200 // 5 minutos
+   //https://nefele.dev/wiki/nefele/ocgi
+   PROPERTY nSessionExpire  INIT 365 // Dias
+   PROPERTY nDuracionCookie INIT 21600 // Secondas => 6 Horas
    PROPERTY cSessionCookie  INIT nfl_ProgName()
+
+   PROPERTY lSendTTFB       INIT .T.
+   PROPERTY lMsgSavePage    INIT .T.
 
    // Este es nuestro Router para evitar inyección de código malicioso y aportar la máxima seguridad.
    // Solo se permite la llamada a los Method de oCgi aquí nombrados que a su vez llaman a Procedure,Function o Method's

@@ -247,7 +247,7 @@ PROCEDURE ControlAcceso()
    ELSE
       //Alimentamos una cookie con los datos de la persona validada
       //Le damos una caducidad por defecto son 5 min.
-      oCGI:SendCodefCookie( "appccuser", cUser, oCGI:nDuracionCookie )
+      oCGI:SendCodefCookie( "appccuser", nId, oCGI:nDuracionCookie )
       AppData:nLang := Val( oCgi:GetCgiValue( "idioma","1" ) )
       MainPage()
       QUIT
@@ -275,6 +275,7 @@ PROCEDURE LogOut()
    LOCAL nAT
    LOCAL nFiles
 
+   oCGI:DeleteCookie( "gep" )
    oCGI:DeleteCookie( "appccuser" )
    oCGI:SetUserData( "cEmp", cEmp )
 
@@ -330,15 +331,15 @@ RETURN
 FUNCTION LoginUser()
 
    LOCAL oUser := oCGI:GetCodefCookie( "appccuser" )
-   LOCAL cUser, hUser
+   LOCAL nUser, hUser
    LOCAL lChkFormUID := ( oCgi:GetCgiValue( "lChkFormUID",oCGI:GetUserData("lChkFormUID" , "1" )) == "1" )
 
    IF HB_ISNIL( oUser )
       LogOut()
    ELSE
       IF oUser:ErrorCode[ 1 ] == 0
-         cUser := oUser:Value
-         IF HB_ISNIL( hUser := GetUser( cUser ) )
+         nUser := Val(oUser:Value)
+         IF HB_ISNIL( hUser := GetUser( nUser ) )
             LogOut()
          ELSE
             lChkFormUID:=(lChkFormUID.OR.(oCGI:nDuracionCookie==__MAXCOOKIETIME__))
@@ -347,7 +348,7 @@ FUNCTION LoginUser()
             ENDIF
             //Alimentamos una cookie con los datos de la persona validada
             //Le damos una caducidad por defecto son 5 min.
-            oCGI:SendCodefCookie( "appccuser", cUser, oCGI:nDuracionCookie )
+            oCGI:SendCodefCookie( "appccuser", nUser, oCGI:nDuracionCookie )
          ENDIF
       ELSE
          LogOut()

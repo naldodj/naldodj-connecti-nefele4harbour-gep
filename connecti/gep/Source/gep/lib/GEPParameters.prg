@@ -37,6 +37,8 @@ PROCEDURE __clearGEPParameters( lCleanAll )
       oCGI:SetUserData( "GEPParameters_" + __cGEPParameter, "" )
    NEXT EACH
 
+   deleteTmpParameters( "GEPParameters" )
+
    hb_default( @lCleanAll, stacktools():IsInCallStack( "LogOut" ) )
 
    IF ( lCleanAll )
@@ -56,16 +58,16 @@ FUNCTION SetGEPParameters( hParameters )
    LOCAL hRetParameter := { => }
    LOCAL hGEPParameter := hGEPParameters()
 
-   LOCAL __cGEPParameter
+   LOCAL cParameter
 
    LOCAL uValue
 
-   FOR EACH __cGEPParameter in hb_HKeys( hGEPParameter )
-      uValue:=oCGI:GetUserData( "GEPParameters_" + __cGEPParameter, "" )
-      if Empty(uValue)
-         uValue:=oCGI:GetUserData( "__GEPParameters:" + __cGEPParameter, "" )
-      endif
-      hRetParameter[__cGEPParameter]:=uValue
+   FOR EACH cParameter in hb_HKeys( hGEPParameter )
+      uValue:=oCGI:GetUserData( "GEPParameters_" + cParameter, "" )
+      IF (Empty(uValue))
+         uValue:=oCGI:GetUserData( "__GEPParameters:" + cParameter, "" )
+      ENDIF
+      hRetParameter[cParameter]:=uValue
    NEXT EACH
 
    setUserDataTmpParameters( "GEPParameters"   , hParameters , .T. , "_" )

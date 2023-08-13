@@ -29,7 +29,7 @@
    </Directories>
    <Options>
       <AutomaticMemvarDeclaration Value="N"/>
-      <DebugInfo Value="Y"/>
+      <DebugInfo Value="N"/>
       <SuppressLineNumberInformation Value="N"/>
       <SuppressShortcutting Value="N"/>
       <WarnningLevel Value="1"/>
@@ -162,6 +162,11 @@
       <File Filename="gep\src\TurnOverGeralEmpresaDashBoard.prg"/>
    </Files>
    <Libraries>
+      <Library Filename="[harbour]libssl-1_1"/>
+      <Library Filename="[harbour]hbssls"/>
+      <Library Filename="[harbour]hbssl_dll"/>
+      <Library Filename="[harbour]hbssl"/>
+      <Library Filename="[harbour]libcrypto-1_1"/>
       <Library Filename="[harbour]libcurl-4"/>
       <Library Filename="[harbour]libcurl"/>
       <Library Filename="[harbour]hbcurls"/>

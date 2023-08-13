@@ -54,11 +54,6 @@ function webAppManifest()
             "type": "image/png",
             "sizes": "250x76"
         }
-    ],
-    "related_applications": [
-        {
-            "platform": "web"
-        }
     ]
 }
       ENDTEXT

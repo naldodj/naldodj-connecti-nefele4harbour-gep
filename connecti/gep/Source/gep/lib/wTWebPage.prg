@@ -26,7 +26,7 @@ METHOD Create() CLASS wTWebPage
     ::Super:cCSS+=CSS()
     ::Super:cInHead+=inHead()
 
-    AAdd(::Super:aScript,Scripts())
+*    AAdd(::Super:aScript,Scripts())
 
     cHtml:=::Super:Create()
 
@@ -50,7 +50,9 @@ static function inHead()
       <link href='https://fonts.googleapis.com/css2?family=Material+Icons' rel='stylesheet' />
       <link rel='manifest' href='gep.webmanifest' crossorigin='use-credentials' />
       <!--<link rel='manifest' href='?webAppManifest' crossorigin='use-credentials' />-->
+      <!--<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4872627829639703" crossorigin="anonymous"></script>-->
    ENDTEXT
+   cInHead+=Scripts()
    return(cInHead)
 
 static function replaceHtmlText(cHtml)
@@ -132,7 +134,11 @@ static function replaceHtmlText(cHtml)
 
 static function Scripts()
 
+   local cFile:="../htdocs/connecti/gep.js"
+
    local cScripts
+
+   IF (!File(cFile))
 
     TEXT INTO cScripts
 function autoformID(JSONDataB64 = "", url = location.pathname, target = "", lshadowsheet = false, cSSTitle = null, cSSSubTitle = null ) {
@@ -221,5 +227,9 @@ function autoformIDAjax(JSONDataB64 = "", url = location.pathname, target = "", 
    $("#autoformIDAjax").submit();
 };
     ENDTEXT
+      HB_MemoWrit(cFile,cScripts)
+    ENDIF
+
+    cScripts:='<script type="text/javascript" src="/connecti/gep.js"></script>'
 
    return(cScripts)
